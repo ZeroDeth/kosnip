@@ -1,8 +1,13 @@
-# Common configuration for all nix-komodo hosts
+# Combined Komodo host configuration
+# Merges the functionality of komodo-host.nix and nix-komodo-common.nix
 { config, pkgs, lib, ... }:
+
+# Function that takes hostname and IP address as parameters
+{ hostname, ipAddress }:
 
 {
   imports = [
+    # hardware-configuration.nix is now imported directly in helpers.nix
     ./../common/nixos.nix
     ./../common/packages.nix
   ];
@@ -13,8 +18,16 @@
     efi.canTouchEfiVariables = true;
   };
 
-  # Common network configuration for Komodo hosts
+  # Network configuration for Komodo hosts
   networking = {
+    hostName = hostname;
+    interfaces.ens18 = {
+      useDHCP = false;
+      ipv4.addresses = [{
+        address = ipAddress;
+        prefixLength = 24;
+      }];
+    };
     firewall.enable = false;
     defaultGateway = "192.168.10.1";
     nameservers = [ "192.168.10.1" ];
@@ -34,6 +47,7 @@
     settings.PermitRootLogin = "yes";
   };
   services.tailscale.enable = true;
+
   # Docker Compose for Komodo deployment
   # As per memory: Using Docker Compose via ironicbadger.docker-compose-generator
   # for MongoDB, Komodo Core, and Komodo Periphery
