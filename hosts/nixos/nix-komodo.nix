@@ -1,9 +1,6 @@
 # Combined Komodo host configuration
 # Merges the functionality of komodo-host.nix and nix-komodo-common.nix
-{ config, pkgs, lib, ... }:
-
-# Function that takes hostname and IP address as parameters
-{ hostname, ipAddress }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -18,16 +15,8 @@
     efi.canTouchEfiVariables = true;
   };
 
-  # Network configuration for Komodo hosts
+  # Common network configuration for Komodo hosts
   networking = {
-    hostName = hostname;
-    interfaces.ens18 = {
-      useDHCP = false;
-      ipv4.addresses = [{
-        address = ipAddress;
-        prefixLength = 24;
-      }];
-    };
     firewall.enable = false;
     defaultGateway = "192.168.10.1";
     nameservers = [ "192.168.10.1" ];
@@ -61,8 +50,8 @@
     isNormalUser = true;
     description = "zerodeth";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
-    packages = with pkgs; [
-      #home-manager
+    packages = [
+      #pkgs.home-manager
     ];
   };
 
