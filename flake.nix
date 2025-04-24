@@ -22,11 +22,13 @@
           system = "x86_64-linux";
           hostname = "nix-komodo-01";
           username = "zerodeth";
+          hostModules = [ ./hosts/nixos/nix-komodo/module.nix ]; # Use common module
         };
         nix-komodo-02 = libx.mkNixos {
           system = "x86_64-linux";
           hostname = "nix-komodo-02";
           username = "zerodeth";
+          hostModules = [ ./hosts/nixos/nix-komodo/module.nix ]; # Use common module
         };
       };
     };
