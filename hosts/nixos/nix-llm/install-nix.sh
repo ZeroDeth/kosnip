@@ -10,10 +10,10 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # disk partitioning etc
-nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ../disko.nix
+nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ../../common/disko.nix
 nixos-generate-config --no-filesystems --root /mnt
 
 # installation
 export NIXPKGS_ALLOW_UNFREE=1
-cp hardware-configuration.nix /mnt/etc/nixos/
+cp ../../common/hardware-configuration.nix /mnt/etc/nixos/
 nixos-install --root /mnt --flake .#nix-llm --impure
