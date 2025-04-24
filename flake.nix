@@ -5,11 +5,8 @@
   };
 
   outputs = { ... }@inputs:
-    with inputs;
     let
-      inherit (self) outputs;
-      stateVersion = "24.11";
-      libx = import ./lib { inherit inputs outputs stateVersion pkgs; };
+      libx = import ./lib { inherit inputs; };
     in
     {
       nixosConfigurations = {

@@ -3,7 +3,7 @@
 {
   imports =
     [
-      ./hardware-configuration.nix
+      # hardware-configuration.nix is now imported directly in helpers.nix
       ./../../common/nixos-common.nix
       ./../../common/common-packages.nix
     ];
@@ -30,7 +30,7 @@
   };
 
   # System localization
-  time.timeZone = "Europe/Berlin";
+  # Note: time.timeZone is already defined in nixos-common.nix
   i18n.defaultLocale = "en_GB.UTF-8";
 
   services.xserver = {
@@ -43,7 +43,6 @@
     settings.PasswordAuthentication = true;
     settings.PermitRootLogin = "yes";
   };
-  services.qemuGuest.enable = true;
   services.tailscale.enable = true;
   # services.ollama = {
   #   enable = true;

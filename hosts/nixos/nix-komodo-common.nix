@@ -13,7 +13,7 @@
     efi.canTouchEfiVariables = true;
   };
 
-  # Common network configuration
+  # Common network configuration for Komodo hosts
   networking = {
     firewall.enable = false;
     defaultGateway = "192.168.10.1";
@@ -21,7 +21,7 @@
   };
 
   # System localization
-  time.timeZone = "Europe/Berlin";
+  # Note: time.timeZone is already defined in nixos-common.nix
   i18n.defaultLocale = "en_GB.UTF-8";
 
   services.xserver = {
@@ -33,12 +33,11 @@
     settings.PasswordAuthentication = true;
     settings.PermitRootLogin = "yes";
   };
-  services.qemuGuest.enable = true;
   services.tailscale.enable = true;
-  # services.komodo = {
-  #   enable = true;
-  #   host = "0.0.0.0";
-  # };
+  # Docker Compose for Komodo deployment
+  # As per memory: Using Docker Compose via ironicbadger.docker-compose-generator
+  # for MongoDB, Komodo Core, and Komodo Periphery
+  virtualisation.oci-containers.backend = "docker";
 
   # userland
   #home-manager.useGlobalPkgs = true;

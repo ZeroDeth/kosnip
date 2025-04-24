@@ -3,6 +3,11 @@ let
   inherit (inputs) nixpkgs nixpkgs-unstable;
 in
 {
+  imports = [
+    ./hardware-common.nix
+  ];
+
+  # Common time zone for all NixOS systems
   time.timeZone = "Europe/Berlin";
   system.stateVersion = "24.11";
 

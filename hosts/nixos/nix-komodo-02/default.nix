@@ -1,20 +1,8 @@
-{ config, pkgs, ... }:
+{ ... }:
 
+# Import the komodo-host function and call it with host-specific parameters
+import ../komodo-host.nix { }
 {
-  imports = [
-    ./hardware-configuration.nix
-    ./../nix-komodo-common.nix
-  ];
-
-  # Host-specific network configuration
-  networking = {
-    hostName = "nix-komodo-02";
-    interfaces.ens18 = {
-      useDHCP = false;
-      ipv4.addresses = [{
-        address = "192.168.10.32";
-        prefixLength = 24;
-      }];
-    };
-  };
+  hostname = "nix-komodo-02";
+  ipAddress = "192.168.10.32";
 }

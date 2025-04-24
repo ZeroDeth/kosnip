@@ -1,5 +1,5 @@
 # lib/helper.nix
-{ inputs, outputs, stateVersion, ... }:
+{ inputs, ... }:
 {
   mkNixos = { system, hostname, username, extraModules ? [ ] }:
     let
@@ -13,6 +13,8 @@
         (inputs.vscode-server.nixosModules.default or { })
         ../hosts/nixos/${hostname}
         ../hosts/common/nixos-common.nix
+        # Include the common hardware configuration directly
+        ../hosts/common/hardware-common.nix
       ] ++ extraModules;
     };
 }

@@ -1,6 +1,6 @@
-{ inputs, outputs, stateVersion, ... }:
+{ inputs, ... }:
 let
-  helpers = import ./helpers.nix { inherit inputs outputs stateVersion; };
+  helpers = import ./helpers.nix { inherit inputs; };
 in
 {
   inherit (helpers)
