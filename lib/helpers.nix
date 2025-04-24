@@ -14,7 +14,7 @@
         ../hosts/nixos/${hostname}
         ../hosts/common/nixos-common.nix
         # Include the common hardware configuration directly
-        ../hosts/common/hardware-common.nix
+        ../hosts/common/hardware-configuration.nix
       ] ++ extraModules;
     };
 }
