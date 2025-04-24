@@ -4,8 +4,8 @@
   imports =
     [
       # hardware-configuration.nix is now imported directly in helpers.nix
-      ./../../common/nixos-common.nix
-      ./../../common/common-packages.nix
+      ./../../common/nixos.nix
+      ./../../common/packages.nix
     ];
 
   # Boot configuration

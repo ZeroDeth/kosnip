@@ -4,7 +4,7 @@ let
 in
 {
   imports = [
-    ./hardware-common.nix
+    ./hardware-configuration.nix
   ];
 
   # Common time zone for all NixOS systems

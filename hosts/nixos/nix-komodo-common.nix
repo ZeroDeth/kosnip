@@ -3,8 +3,8 @@
 
 {
   imports = [
-    ./../common/nixos-common.nix
-    ./../common/common-packages.nix
+    ./../common/nixos.nix
+    ./../common/packages.nix
   ];
 
   # Boot configuration
