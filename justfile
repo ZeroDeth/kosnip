@@ -2,11 +2,11 @@
 
 ## repo configuration
 sub-update:
-cd .. && git submodule update --init --recursive
+  cd .. && git submodule update --init --recursive
 
 ## nix installation
 install-llm IP:
-ssh -o "StrictHostKeyChecking no" nixos@{{IP}} "sudo bash -c '\
+  ssh -o "StrictHostKeyChecking no" nixos@{{IP}} "sudo bash -c '\
   nix-shell -p git --run \"cd /root/ && \
   git clone -b nix-llm https://github.com/ZeroDeth/kosnip.git && \
   cd kosnip/hosts/nixos/nix-llm/ && \
@@ -28,9 +28,9 @@ install-komodo-02 IP:
 
 ## nix updates
 hostname := `hostname | cut -d "." -f 1`
-[linux]
+
 switch-llm target_host=hostname:
-cd hosts/nixos/nix-llm && sudo nixos-rebuild switch --flake .#{{target_host}}
+  cd hosts/nixos/nix-llm && sudo nixos-rebuild switch --flake .#{{target_host}}
 
 switch-komodo-01 target_host="nix-komodo-01":
   sudo nixos-rebuild switch --flake .#{{target_host}}
@@ -40,4 +40,4 @@ switch-komodo-02 target_host="nix-komodo-02":
 
 ## copy docker compose yaml to remote host via Ansible
 compose HOST *V:
-cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags compose {{V}}
+  cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags compose {{V}}
