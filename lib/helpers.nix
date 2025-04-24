@@ -12,8 +12,8 @@
       modules = [
         (inputs.vscode-server.nixosModules.default or { })
         ../hosts/nixos/${hostname}
-        ../hosts/common/nixos.nix
-        # Include the common hardware configuration directly
+        # Common hardware configuration is imported directly
+        # Note: nixos.nix is imported by each host's default.nix
         ../hosts/common/hardware-configuration.nix
       ] ++ extraModules;
     };
