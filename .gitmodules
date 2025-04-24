@@ -1,0 +1,6 @@
+[submodule "ansible/roles/ansible-role-komodo"]
+	path = ansible/roles/ansible-role-komodo
+	url = https://github.com/bpbradley/ansible-role-komodo
+[submodule "ansible/roles/ironicbadger.docker-compose-generator"]
+	path = ansible/roles/ironicbadger.docker-compose-generator
+	url = https://github.com/ironicbadger/ansible-role-docker-compose-generator

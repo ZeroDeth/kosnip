@@ -1,0 +1,11 @@
+[Unit]
+Description=Agent to connect with Komodo Core
+
+[Service]
+Environment="HOME={{ komodo_home }}"
+ExecStart=/bin/sh -lc "{{ komodo_bin_path }} --config-path {{ komodo_config_path }}"
+Restart=on-failure
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target
