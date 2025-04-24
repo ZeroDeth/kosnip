@@ -3,3 +3,8 @@
     roles:
       - role: ironicbadger.docker-compose-generator
         tags: compose
+
+  - hosts: nix-komodo
+    roles:
+      - role: ironicbadger.docker-compose-generator
+        tags: compose
