@@ -7,15 +7,15 @@ services:
       - "/opt/appdata/apps/ollama:/root/.ollama"
     ports:
       - 11434:11434
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: cdi
-              capabilities:
-                - gpu
-              device_ids:
-                - nvidia.com/gpu=all
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: cdi
+    #           capabilities:
+    #             - gpu
+    #           device_ids:
+    #             - nvidia.com/gpu=all
     restart: unless-stopped
   openwebui:
     image: ghcr.io/open-webui/open-webui:main
