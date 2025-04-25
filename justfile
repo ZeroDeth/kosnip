@@ -52,3 +52,15 @@ switch-komodo-02 target_host="nix-komodo-02":
 # Copies Docker Compose YAML to a remote host
 compose HOST *V:
   cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags compose {{V}}
+
+# Copy all configuration files to remote hosts
+config-files HOST *V:
+  cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags config_files {{V}}
+
+# Copy LLM configuration files to remote host
+llm-config HOST *V:
+  cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags llm_config {{V}}
+
+# Copy Komodo configuration files to remote hosts
+komodo-config HOST *V:
+  cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags komodo_config {{V}}

@@ -1,5 +1,13 @@
 ---
   - hosts: nix-llm
+    vars:
+      docker_compose_output_path: "~"
+    tasks:
+      - name: Copy openwebui.json file
+        copy:
+          src: "{{ playbook_dir }}/services/nix-llm/openwebui.json"
+          dest: "{{ docker_compose_output_path }}/openwebui.json"
+        tags: [compose, config_files, llm_config]
     roles:
       - role: ironicbadger.docker-compose-generator
         tags: compose
@@ -7,6 +15,13 @@
   - hosts: nix-komodo
     vars:
       docker_compose_hostname: "nix-komodo"
+      docker_compose_output_path: "~"
+    tasks:
+      - name: Copy .env file
+        copy:
+          src: "{{ playbook_dir }}/services/nix-komodo/.env"
+          dest: "{{ docker_compose_output_path }}/.env"
+        tags: [compose, config_files, komodo_config]
     roles:
       - role: ironicbadger.docker-compose-generator
         tags: compose
