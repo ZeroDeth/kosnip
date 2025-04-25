@@ -2,7 +2,7 @@
 
 # Repository configuration
 sub-update:
-  cd .. && git submodule update --init --recursive
+  git submodule update --init --recursive
 
 # NixOS installation recipes
 # Each recipe installs NixOS on a remote host via SSH
