@@ -66,6 +66,14 @@ deploy-komodo-02 target_host="nix-komodo-02":
   # Clone the repository on the remote host and build there
   ssh root@{{target_host}} "cd /root && rm -rf kosnip && git clone https://github.com/ZeroDeth/kosnip.git && cd kosnip && nixos-rebuild switch --flake .#{{target_host}}"
 
+# Show the current NixOS system configuration on a remote host
+show-config target_host="nix-llm":
+  ssh root@{{target_host}} "readlink -f /run/current-system && ls -la /nix/var/nix/profiles/system* && echo '\nActive configuration files:' && find /root/kosnip -name '*.nix' | grep -v '.git'"
+
+# Show the current NixOS system configuration settings
+show-settings target_host="nix-llm":
+  ssh root@{{target_host}} "nixos-rebuild dry-activate --flake /root/kosnip#{{target_host}} && echo '\nCurrent hostname:' && hostname && echo '\nNetwork configuration:' && ip addr show && echo '\nEnabled services:' && systemctl list-units --type=service --state=active | grep -v '.slice'"
+
 # Docker Compose deployment via Ansible
 # Copies Docker Compose YAML to a remote host
 compose HOST *V:
