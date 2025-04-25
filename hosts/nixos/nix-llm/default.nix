@@ -65,8 +65,8 @@
   # Hardware configuration
   hardware = {
     graphics = {
-      enable = true;
-      enable32Bit = true;
+      enable = false;
+      enable32Bit = false;
     };
     nvidia = {
       modesetting.enable = false;
