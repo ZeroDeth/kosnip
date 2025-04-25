@@ -1,16 +1,20 @@
-# [Build a private, self-hosted LLM server with Proxmox, PCle passthrough, Ollama & NixOS - YouTube](https://www.youtube.com/watch?v=9hni6rLfMTg)
+# Build a Private, Self-Hosted LLM Server with Proxmox, PCIe Passthrough, Ollama & NixOS
 
-# Getting Started with Nix, SSH, & Tailscale
+This guide walks you through setting up a private LLM server on NixOS, running in a Proxmox VM, with optional PCIe passthrough and secure remote access via SSH and Tailscale. By the end, you’ll have a production-ready system for running large language models, with modern DevOps practices.
 
-This documentation provides a guide on how to get started with Nix, SSH, and Tailscale. These tools are powerful for setting up environments, remote access, and secure networking.
+> **Reference Video:** [YouTube: Build a private, self-hosted LLM server with Proxmox, PCIe passthrough, Ollama & NixOS](https://www.youtube.com/watch?v=9hni6rLfMTg)
+
 
 ## Prerequisites
 
-Before beginning, ensure you have the following:
+Before beginning, ensure you have:
 
-1. A compatible machine to install NixOS.
-2. Basic understanding of virtualization and networking.
-3. Administrative access to virtualization software like Proxmox or any other similar platform.
+- A compatible machine to install NixOS (bare metal or VM).
+- Administrative access to Proxmox or similar virtualization platform.
+- Basic understanding of virtualization, networking, and the command line.
+- A working Nix installation on your local machine (for remote deployment/testing).
+- (Recommended) Familiarity with SSH, Tailscale, and Docker Compose.
+
 
 ## Setting Up NixOS
 
@@ -38,12 +42,12 @@ Before beginning, ensure you have the following:
 
 1. **Boot VM**: Start the VM and access the console.
 2. **Begin Installation**: Follow the installation prompts to set up NixOS.
-3. **Set SSH Password**: Use `passwd` to set an SSH password.
+3. **Set SSH Password (Live Installer)**: Use `passwd` to set an SSH password for the live session (needed for initial remote access).
 4. **SSH into VM**: Connect via SSH for ease of configuration.
 
 ### Step 5: Configure NixOS
 
-- **Root Password**: Set a root password for the freshly installed NixOS.
+- **Root Password (Installed System)**: After installation, set a root password for the freshly installed NixOS (see below).
 - **Network Configuration**: Update the network settings as needed for your environment.
 - **Install nix-llm**: Use the justfile to automate the installation. From your project root, run:
 
@@ -52,69 +56,121 @@ Before beginning, ensure you have the following:
   ```
   Replace `<IP_ADDRESS>` with the address of your NixOS VM.
 
+  **Before rebooting your NixOS VM, set the password for the `nixos` user inside the installed system:**
+
+  ```sh
+  ssh nixos@<IP_ADDRESS>   # Connect to your VM as the default user
+  sudo su                  # Become root
+  nixos-enter --root /mnt  # Enter the installed system (chroot)
+  passwd                   # Set the root password for the installed system
+  exit                     # Exit the chroot
+  reboot                   # Reboot into your new NixOS installation
+  ```
+
+  > **Note:**
+  > The first `passwd` sets a password for the live installer. The second (inside the chroot) sets the password for the actual installed system. This ensures you can SSH in after reboot.
+
+- **Verify Installation**: After reboot, SSH in and check system status:
+  ```sh
+  ssh root@<IP_ADDRESS>
+  nixos-version
+  hostnamectl
+  ```
+
 ## Setting Up SSH
 
-1. **Enable SSH**: Ensure SSH is enabled on your NixOS instance.
-2. **Access via SSH**: Use the set SSH credentials to access your NixOS machine remotely.
+SSH access to your NixOS VM is handled automatically by Tailscale and the justfile workflow in this repository. You do **not** need to manually configure SSH keys or edit `configuration.nix` for SSH access.
+
+- After running `tailscale up --ssh` on your VM, you can securely SSH to it using Tailscale’s built-in authentication and the Tailscale-assigned IP or hostname.
+- The `just` commands in this repo automate the provisioning and connection process using Nix flakes and Tailscale.
+
+> **Note:**
+> If you encounter SSH connection issues, ensure Tailscale is running and authenticated on both client and VM. Manual SSH configuration is only needed for advanced or custom setups.
 
 ## Install and Configure Tailscale
 
-1. **Authenticate Tailscale**:
-    - Run:
-      ```sh
-      tailscale up --ssh
-      ```
-    - Authenticate using your Tailscale account.
+[Tailscale](https://tailscale.com/) is a secure, zero-config VPN that makes your VM accessible from anywhere. Sign up at tailscale.com if you don’t have an account.
+
+1. **Install and Authenticate Tailscale**:
+   ```sh
+   tailscale up --ssh
+   ```
+   Follow the authentication URL in your terminal to connect your VM to your Tailscale network.
 2. **Connect Devices**:
-    - Once authenticated, your NixOS VM can securely connect to your Tailscale network.
+   Once authenticated, your NixOS VM can securely connect to your Tailscale network.
 3. **Update Submodules**:
-    - From your project root, run:
-      ```sh
-      just sub-update
-      ```
+   From your project root:
+   ```sh
+   just sub-update
+   ```
 4. **Generate Docker Compose for nix-llm**:
-    - Run:
-      ```sh
-      just compose nix-llm
-      ```
+   ```sh
+   just compose nix-llm
+   ```
+   This generates a `docker-compose.yml` for the LLM stack.
 5. **Start the LLM Services**:
-    - SSH into your NixOS VM, navigate to the directory with your generated `docker-compose.yml`, and run:
-      ```sh
-      docker compose up --watch
-      ```
+   SSH into your NixOS VM, navigate to the directory with your generated `docker-compose.yml`, and run:
+   ```sh
+   docker compose up --watch
+   ```
+
+> **Tip:** If you need persistent storage, ensure Docker volumes are mapped to disk locations that will survive VM reboots.
 
 ## PCIe Pass-through (Optional)
 
 If you need to pass through a GPU to your VM:
 
-1. **Verify Compatibility**: Ensure hardware (motherboard, CPU, GPU) supports PCIe pass-through.
+1. **Verify Compatibility**: Ensure your hardware (motherboard, CPU, and GPU) supports PCIe pass-through (IOMMU/VT-d/AMD-Vi must be enabled in BIOS/UEFI).
 2. **Configure Proxmox**:
-    - Add the GPU as a PCI device in the VM's hardware settings.
-    - Check Proxmox documentation for specifics on setting up PCIe pass-through.
+   - Add the GPU as a PCI device in the VM's hardware settings.
+   - See the [Proxmox PCIe Passthrough documentation](https://pve.proxmox.com/wiki/PCI_Passthrough) for detailed steps.
 3. **Validate Setup**:
-    - SSH into your NixOS VM and run `nvidia-smi` to verify GPU recognition.
+   - SSH into your NixOS VM and run:
+     ```sh
+     nvidia-smi
+     ```
+     to verify GPU recognition.
+
+> **Warning:** PCIe passthrough can be tricky and hardware-specific. Consult your motherboard and Proxmox documentation for troubleshooting.
 
 ## Serving Open WebUI Securely with Tailscale
 
-To securely expose your Open WebUI instance over your Tailscale network with automatic HTTPS certificates, you can use Tailscale's built-in HTTPS serving feature. This is especially useful for securely accessing web interfaces like Open WebUI from any device on your Tailscale network.
-
-**Steps:**
+To securely expose your Open WebUI instance over your Tailscale network with automatic HTTPS certificates, use Tailscale’s built-in HTTPS serving feature:
 
 1. Ensure Open WebUI is running and listening on port 8080 (or your chosen port).
-2. In your terminal, run the following command:
-
+2. In your terminal, run:
    ```sh
    tailscale serve --bg 8080
    ```
-
-   This command will serve the local port 8080 over HTTPS to your Tailscale network, using certificates managed by Tailscale.
-
-3. Access the web UI using your machine's Tailscale domain (e.g., `https://<your-machine-name>.ts.net`).
+   This serves local port 8080 over HTTPS to your Tailscale network, using certificates managed by Tailscale.
+3. Access the web UI using your machine’s Tailscale domain (e.g., `https://<your-machine-name>.ts.net`).
 
 For more details, see the [Tailscale Serve documentation](https://tailscale.com/kb/1227/serve/).
 
 ---
 
-## Conclusion
+## Troubleshooting
 
-By following these steps, you now have a basic setup using NixOS, SSH, and Tailscale. This setup provides a solid foundation for further exploration into network management, virtualization, and secure cloud connectivity. For more advanced configurations, consult detailed documentation or community forums related to each tool.
+- **SSH not working:**
+  - Double-check network/firewall settings.
+  - Ensure SSH is enabled and configured in your NixOS configuration.
+  - Use `journalctl -u sshd` for logs.
+- **Tailscale issues:**
+  - Run `tailscale status` and `tailscale up` for diagnostics.
+  - Check your Tailscale dashboard for device visibility.
+- **Docker not starting:**
+  - Ensure Docker is installed and the service is running.
+  - Use `docker compose logs` for troubleshooting.
+- **General:**
+  - Reboot the VM if you make significant configuration changes.
+  - Consult NixOS, Proxmox, or Tailscale documentation for advanced troubleshooting.
+
+---
+
+## References & Further Reading
+
+- [NixOS Manual](https://nixos.org/manual/nixos/stable/)
+- [Proxmox Documentation](https://pve.proxmox.com/wiki/Main_Page)
+- [Tailscale Documentation](https://tailscale.com/kb/)
+- [Docker Compose Docs](https://docs.docker.com/compose/)
+- [YouTube: Build a private, self-hosted LLM server with Proxmox, PCIe passthrough, Ollama & NixOS](https://www.youtube.com/watch?v=9hni6rLfMTg)
