@@ -48,6 +48,24 @@ switch-komodo-01 target_host="nix-komodo-01":
 switch-komodo-02 target_host="nix-komodo-02":
   sudo nixos-rebuild switch --flake .#{{target_host}}
 
+# Remote deployment recipes
+# Deploy NixOS configuration to remote hosts directly
+
+# Deploy to nix-llm from local machine (using SSH approach)
+deploy-llm target_host="nix-llm":
+  # Clone the repository on the remote host and build there
+  ssh root@{{target_host}} "cd /root && rm -rf kosnip && git clone https://github.com/ZeroDeth/kosnip.git && cd kosnip && nixos-rebuild switch --flake .#{{target_host}}"
+
+# Deploy to nix-komodo-01 from local machine (using SSH approach)
+deploy-komodo-01 target_host="nix-komodo-01":
+  # Clone the repository on the remote host and build there
+  ssh root@{{target_host}} "cd /root && rm -rf kosnip && git clone https://github.com/ZeroDeth/kosnip.git && cd kosnip && nixos-rebuild switch --flake .#{{target_host}}"
+
+# Deploy to nix-komodo-02 from local machine (using SSH approach)
+deploy-komodo-02 target_host="nix-komodo-02":
+  # Clone the repository on the remote host and build there
+  ssh root@{{target_host}} "cd /root && rm -rf kosnip && git clone https://github.com/ZeroDeth/kosnip.git && cd kosnip && nixos-rebuild switch --flake .#{{target_host}}"
+
 # Docker Compose deployment via Ansible
 # Copies Docker Compose YAML to a remote host
 compose HOST *V:
