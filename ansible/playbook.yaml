@@ -5,6 +5,8 @@
         tags: compose
 
   - hosts: nix-komodo
+    vars:
+      docker_compose_hostname: "nix-komodo"
     roles:
       - role: ironicbadger.docker-compose-generator
         tags: compose
