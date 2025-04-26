@@ -17,6 +17,7 @@ in
     watch
     wget
     vim
+    nix-ld
 
     # requires nixpkgs.config.allowUnfree = true;
     vscode-extensions.ms-vscode-remote.remote-ssh

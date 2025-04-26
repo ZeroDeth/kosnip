@@ -38,4 +38,7 @@ in
       options = "--delete-older-than 5";
     };
   };
+
+  # Enable nix-ld system-wide for foreign binaries
+  programs.nix-ld.enable = true;
 }
