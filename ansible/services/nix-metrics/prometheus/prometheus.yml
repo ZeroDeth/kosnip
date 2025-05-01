@@ -25,5 +25,6 @@ scrape_configs:
       - targets: ['cadvisor:8080']
 
   - job_name: 'promcontainer'
+    metrics_path: '/metrics'
     static_configs:
-      - targets: ['nix-metrics:5252/metrics'] # tailscale set --webclient and tailscale metrics
+      - targets: ['nix-metrics:5252'] # tailscale set --webclient and tailscale metrics
