@@ -12,7 +12,7 @@ services:
     environment:
       - "TS_AUTH_KEY=${TS_AUTH_KEY}"
       - TS_STATE_DIR=/var/lib/tailscale
-      - TS_ENABLE_METRICS=true
+      - TS_ENABLE_METRICS=${TS_ENABLE_METRICS}
     restart: unless-stopped
 
   grafana:
@@ -23,7 +23,7 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_USERS_ALLOW_SIGN_UP=${GF_USERS_ALLOW_SIGN_UP}
     volumes:
       - ${PWD}/grafana:/var/lib/grafana
 
@@ -40,7 +40,7 @@ services:
     environment:
       - "TS_AUTH_KEY=${TS_AUTH_KEY}"
       - TS_STATE_DIR=/var/lib/tailscale
-      - TS_ENABLE_METRICS=true
+      - TS_ENABLE_METRICS=${TS_ENABLE_METRICS}
     restart: unless-stopped
 
   prometheus:
