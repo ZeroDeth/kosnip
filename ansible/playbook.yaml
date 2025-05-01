@@ -20,6 +20,27 @@
       - role: ironicbadger.docker-compose-generator
         tags: compose
 
+  - hosts: nix-metrics
+    vars:
+      docker_compose_output_path: "/opt/metrics"
+      docker_compose_generator_output_path: "/opt/metrics"
+    tasks:
+      - name: Ensure /opt/metrics directory exists
+        file:
+          path: "{{ docker_compose_output_path }}"
+          state: directory
+          mode: '0755'
+        tags: [compose, config_files, metrics_config]
+
+      - name: Copy metrics.yml file
+        copy:
+          src: "{{ playbook_dir }}/services/nix-metrics/metrics.yml"
+          dest: "{{ docker_compose_output_path }}/metrics.yml"
+        tags: [compose, config_files, metrics_config]
+    roles:
+      - role: ironicbadger.docker-compose-generator
+        tags: compose
+
   - hosts: nix-komodo
     vars:
       docker_compose_hostname: "nix-komodo"
