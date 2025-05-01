@@ -1,25 +1,26 @@
 services:
-  grafana-ts:
-    image: tailscale/tailscale:latest
-    container_name: grafana-ts
-    hostname: grafana
-    volumes:
-      - ${PWD}/grafana/tailscale/state:/var/lib/tailscale
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    environment:
-      - "TS_AUTH_KEY=${TS_AUTH_KEY}"
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_ENABLE_METRICS=${TS_ENABLE_METRICS}
-    restart: unless-stopped
+  # grafana-ts:
+  #   image: tailscale/tailscale:latest
+  #   container_name: grafana-ts
+  #   hostname: grafana
+  #   volumes:
+  #     - ${PWD}/grafana/tailscale/state:/var/lib/tailscale
+  #     - /dev/net/tun:/dev/net/tun
+  #   cap_add:
+  #     - NET_ADMIN
+  #     - NET_RAW
+  #   environment:
+  #     - "TS_AUTH_KEY=${TS_AUTH_KEY}"
+  #     - TS_STATE_DIR=/var/lib/tailscale
+  #     - TS_ENABLE_METRICS=${TS_ENABLE_METRICS}
+  #   restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
     restart: unless-stopped
-    network_mode: service:grafana-ts
+    ports:
+      - "3000:3000"
     user: "${GRAFANA_USER_ID:-1000}:${GRAFANA_GROUP_ID:-1000}"
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
@@ -31,27 +32,28 @@ services:
       - ${PWD}/grafana/provisioning:/etc/grafana/provisioning
       - ${PWD}/grafana/dashboards:/var/lib/grafana/dashboards
 
-  prometheus-ts:
-    image: tailscale/tailscale:latest
-    container_name: prometheus-ts
-    hostname: prometheus
-    volumes:
-      - ${PWD}/prometheus/tailscale/state:/var/lib/tailscale
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    environment:
-      - "TS_AUTH_KEY=${TS_AUTH_KEY}"
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_ENABLE_METRICS=${TS_ENABLE_METRICS}
-    restart: unless-stopped
+  # prometheus-ts:
+  #   image: tailscale/tailscale:latest
+  #   container_name: prometheus-ts
+  #   hostname: prometheus
+  #   volumes:
+  #     - ${PWD}/prometheus/tailscale/state:/var/lib/tailscale
+  #     - /dev/net/tun:/dev/net/tun
+  #   cap_add:
+  #     - NET_ADMIN
+  #     - NET_RAW
+  #   environment:
+  #     - "TS_AUTH_KEY=${TS_AUTH_KEY}"
+  #     - TS_STATE_DIR=/var/lib/tailscale
+  #     - TS_ENABLE_METRICS=${TS_ENABLE_METRICS}
+  #   restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    network_mode: service:prometheus-ts
     restart: unless-stopped
+    ports:
+      - "9090:9090"
     user: "${PROMETHEUS_USER_ID:-65534}:${PROMETHEUS_GROUP_ID:-65534}"
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -78,7 +80,7 @@ services:
     ports:
       - "9100:9100"
     # Make node-exporter accessible to host network
-    network_mode: "host"
+    # network_mode: "host"
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -93,7 +95,7 @@ services:
     ports:
       - "8080:8080"
     # Make cadvisor accessible to host network
-    network_mode: "host"
+    # network_mode: "host"
 
   # loadgen:
   #   build:
