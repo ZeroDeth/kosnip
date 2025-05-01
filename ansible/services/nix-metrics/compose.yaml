@@ -48,13 +48,14 @@ services:
     container_name: prometheus
     network_mode: service:prometheus-ts
     restart: unless-stopped
+    user: "65534:65534"
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=30d"
       - "--web.enable-lifecycle"
     volumes:
-      - ${PWD}/prometheus/etc:/etc/prometheus
+      - ${PWD}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ${PWD}/prometheus/data:/prometheus
 
   node-exporter:

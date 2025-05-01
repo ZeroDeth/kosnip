@@ -45,6 +45,15 @@
           dest: "{{ docker_compose_output_path }}/.env"
           force: no
         tags: [compose, config_files, metrics_config]
+        
+      - name: Ensure Prometheus data directory exists
+        file:
+          path: "{{ docker_compose_output_path }}/prometheus/data"
+          state: directory
+          mode: '0755'
+          owner: '65534'
+          group: '65534'
+        tags: [compose, config_files, metrics_config]
     roles:
       - role: ironicbadger.docker-compose-generator
         tags: compose
