@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from itertools import cycle
 import os
 
-PROMETHEUS_URL = "http://prometheus.velociraptor-noodlefish.ts.net:9090"
+PROMETHEUS_URL = os.environ.get("PROMETHEUS_URL", "http://prometheus:9090")
 ENDPOINTS = [
     "/api/v1/query?query=up",
     "/api/v1/query?query=rate(tailscaled_inbound_bytes_total[5m])",
