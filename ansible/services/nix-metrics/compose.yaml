@@ -20,6 +20,7 @@ services:
     container_name: grafana
     restart: unless-stopped
     network_mode: service:grafana-ts
+    user: "${GRAFANA_USER_ID:-$(id -u)}:${GRAFANA_GROUP_ID:-$(id -g)}"
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
@@ -48,7 +49,7 @@ services:
     container_name: prometheus
     network_mode: service:prometheus-ts
     restart: unless-stopped
-    user: "65534:65534"
+    user: "${PROMETHEUS_USER_ID:-nobody}:${PROMETHEUS_GROUP_ID:-nogroup}"
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
