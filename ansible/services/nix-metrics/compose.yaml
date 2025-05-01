@@ -92,17 +92,17 @@ services:
     networks:
       - monitoring
 
-  loadgen:
-    build:
-      context: ./loadgen
-    container_name: loadgen
-    restart: unless-stopped
-    environment:
-      - PROMETHEUS_URL=${PROMETHEUS_URL}
-    depends_on:
-      - prometheus
-    networks:
-      - monitoring
+  # loadgen:
+  #   build:
+  #     context: ./loadgen
+  #   container_name: loadgen
+  #   restart: unless-stopped
+  #   environment:
+  #     - PROMETHEUS_URL=${PROMETHEUS_URL}
+  #   depends_on:
+  #     - prometheus
+  #   networks:
+  #     - monitoring
 
 networks:
   monitoring:
