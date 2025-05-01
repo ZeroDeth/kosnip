@@ -25,8 +25,11 @@ services:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=${GF_USERS_ALLOW_SIGN_UP}
+      - PROMETHEUS_URL=${PROMETHEUS_URL}
     volumes:
-      - ${PWD}/grafana:/var/lib/grafana
+      - ${PWD}/grafana/data:/var/lib/grafana
+      - ${PWD}/grafana/provisioning:/etc/grafana/provisioning
+      - ${PWD}/grafana/dashboards:/var/lib/grafana/dashboards
 
   prometheus-ts:
     image: tailscale/tailscale:latest

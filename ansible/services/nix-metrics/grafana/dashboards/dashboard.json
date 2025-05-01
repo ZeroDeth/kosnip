@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS}"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -70,7 +70,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(tailscaled_inbound_bytes_total[5m]))",
@@ -81,7 +81,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(tailscaled_outbound_bytes_total[5m]))",
@@ -96,7 +96,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS}"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -175,7 +175,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "rate(tailscaled_inbound_packets_total{path=~\"$path\"}[5m])",
@@ -186,7 +186,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "rate(tailscaled_outbound_packets_total{path=~\"$path\"}[5m])",
@@ -202,7 +202,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS}"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -254,7 +254,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "tailscaled_health_messages{type=\"warning\"}",
@@ -268,7 +268,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS}"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -315,7 +315,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "tailscaled_advertised_routes",
@@ -326,7 +326,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS}"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "tailscaled_approved_routes",
@@ -363,7 +363,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS}"
+          "uid": "prometheus"
         },
         "definition": "label_values(tailscaled_inbound_packets_total,path)",
         "description": "",

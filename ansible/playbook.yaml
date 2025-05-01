@@ -59,13 +59,19 @@
           group: "{{ prometheus_group_id }}"
         tags: [compose, config_files, metrics_config]
         
-      - name: Ensure Grafana directory exists with correct permissions
+      - name: Ensure Grafana directories exist with correct permissions
         file:
-          path: "{{ docker_compose_output_path }}/grafana"
+          path: "{{ docker_compose_output_path }}/{{ item }}"
           state: directory
           mode: '0755'
           owner: "{{ grafana_user_id }}"
           group: "{{ grafana_group_id }}"
+          recurse: yes
+        with_items:
+          - grafana/data
+          - grafana/dashboards
+          - grafana/provisioning/dashboards
+          - grafana/provisioning/datasources
         tags: [compose, config_files, metrics_config]
     roles:
       - role: ironicbadger.docker-compose-generator
