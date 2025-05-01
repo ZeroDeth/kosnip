@@ -26,4 +26,4 @@ scrape_configs:
 
   - job_name: 'promcontainer'
     static_configs:
-      - targets: ['nix-metrics:5252/metrics']
+      - targets: ['nix-metrics:5252/metrics'] # tailscale set --webclient and tailscale metrics
