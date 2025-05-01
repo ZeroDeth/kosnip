@@ -16,6 +16,14 @@ install-llm IP:
     cd kosnip/hosts/nixos/nix-llm/ && \
     sh install-nix.sh nix-llm\"'"
 
+# Install NixOS on nix-metrics host
+install-metrics IP:
+  ssh -o "StrictHostKeyChecking no" nixos@{{IP}} "sudo bash -c '\
+    nix-shell -p git --run \"cd /root/ && \
+    git clone https://github.com/ZeroDeth/kosnip.git && \
+    cd kosnip/hosts/nixos/nix-metrics/ && \
+    sh install-nix.sh nix-metrics\"'"
+
 # Install NixOS on nix-komodo-01 host
 install-komodo-01 IP:
   ssh -o "StrictHostKeyChecking no" nixos@{{IP}} "sudo bash -c '\
@@ -37,8 +45,12 @@ install-komodo-02 IP:
 hostname := `hostname | cut -d "." -f 1`
 
 # Update NixOS configuration on nix-llm host
-switch-llm target_host=hostname:
+switch-llm target_host="nix-llm":
   cd hosts/nixos/nix-llm && sudo nixos-rebuild switch --flake .#{{target_host}}
+
+# Update NixOS configuration on nix-metrics host
+switch-metrics target_host="nix-metrics":
+  cd hosts/nixos/nix-metrics && sudo nixos-rebuild switch --flake .#{{target_host}}
 
 # Update NixOS configuration on nix-komodo-01 host
 switch-komodo-01 target_host="nix-komodo-01":
@@ -53,6 +65,11 @@ switch-komodo-02 target_host="nix-komodo-02":
 
 # Deploy to nix-llm from local machine (using SSH approach)
 deploy-llm target_host="nix-llm":
+  # Clone the repository on the remote host and build there
+  ssh root@{{target_host}} "cd /root && rm -rf kosnip && git clone https://github.com/ZeroDeth/kosnip.git && cd kosnip && nixos-rebuild switch --flake .#{{target_host}}"
+
+# Deploy to nix-metrics from local machine (using SSH approach)
+deploy-metrics target_host="nix-metrics":
   # Clone the repository on the remote host and build there
   ssh root@{{target_host}} "cd /root && rm -rf kosnip && git clone https://github.com/ZeroDeth/kosnip.git && cd kosnip && nixos-rebuild switch --flake .#{{target_host}}"
 
@@ -86,6 +103,10 @@ config-files HOST *V:
 # Copy LLM configuration files to remote host
 llm-config HOST *V:
   cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags llm_config {{V}}
+
+# Copy Metrics configuration files to remote host
+metrics-config HOST *V:
+  cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags metrics_config {{V}}
 
 # Copy Komodo configuration files to remote hosts
 komodo-config HOST *V:
