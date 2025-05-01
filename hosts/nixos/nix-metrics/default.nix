@@ -43,7 +43,7 @@
     settings.PasswordAuthentication = true;
     settings.PermitRootLogin = "yes";
   };
-  services.tailscale.enable = true;
+  services.tailscale.enable = false;
 
   # userland
   #home-manager.useGlobalPkgs = true;
