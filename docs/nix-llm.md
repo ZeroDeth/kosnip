@@ -135,7 +135,7 @@ If you need to pass through a GPU to your VM:
 
 ## Serving Open WebUI Securely with Tailscale
 
-To securely expose your Open WebUI instance over your Tailscale network with automatic HTTPS certificates, use Tailscale’s built-in HTTPS serving feature:
+To securely expose your Open WebUI instance over your Tailscale network with automatic HTTPS certificates, use Tailscale's built-in HTTPS serving feature:
 
 1. Ensure Open WebUI is running and listening on port 8080 (or your chosen port).
 2. In your terminal, run:
@@ -143,7 +143,12 @@ To securely expose your Open WebUI instance over your Tailscale network with aut
    tailscale serve --bg 8080
    ```
    This serves local port 8080 over HTTPS to your Tailscale network, using certificates managed by Tailscale.
-3. Access the web UI using your machine’s Tailscale domain (e.g., `https://<your-machine-name>.ts.net`).
+3. Enable the web client for browser-based SSH access:
+   ```sh
+   tailscale set --webclient
+   ```
+   This enables Tailscale's web client feature, allowing you to access your machine via SSH directly from a browser.
+4. Access the web UI using your machine's Tailscale domain (e.g., `https://<your-machine-name>.ts.net`).
 
 For more details, see the [Tailscale Serve documentation](https://tailscale.com/kb/1227/serve/).
 
