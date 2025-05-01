@@ -32,10 +32,11 @@
           mode: '0755'
         tags: [compose, config_files, metrics_config]
 
-      - name: Copy metrics.yml file
+      - name: Copy all files and directories from nix-metrics
         copy:
-          src: "{{ playbook_dir }}/services/nix-metrics/metrics.yml"
-          dest: "{{ docker_compose_output_path }}/metrics.yml"
+          src: "{{ playbook_dir }}/services/nix-metrics/"
+          dest: "{{ docker_compose_output_path }}/"
+          directory_mode: '0755'
         tags: [compose, config_files, metrics_config]
     roles:
       - role: ironicbadger.docker-compose-generator
