@@ -24,6 +24,6 @@ scrape_configs:
     static_configs:
       - targets: ['cadvisor:8080']
 
-  # - job_name: 'promcontainer'
-  #   static_configs:
-  #     - targets: ['prometheus:9002']
+  - job_name: 'promcontainer'
+    static_configs:
+      - targets: ['nix-metrics:5252/metrics']
