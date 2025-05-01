@@ -49,7 +49,7 @@ services:
     container_name: prometheus
     network_mode: service:prometheus-ts
     restart: unless-stopped
-    user: "${PROMETHEUS_USER_ID:-nobody}:${PROMETHEUS_GROUP_ID:-nogroup}"
+    user: "${PROMETHEUS_USER_ID:-nobody}:${PROMETHEUS_GROUP_ID:-nobody}"
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"

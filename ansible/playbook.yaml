@@ -25,7 +25,7 @@
       docker_compose_output_path: "/opt/metrics"
       docker_compose_generator_output_path: "/opt/metrics"
       prometheus_user: "nobody"
-      prometheus_group: "nogroup"
+      prometheus_group: "nobody"
       grafana_user: "{{ ansible_user_id | default('root') }}"
       grafana_group: "{{ ansible_user_gid | default('root') }}"
     tasks:
