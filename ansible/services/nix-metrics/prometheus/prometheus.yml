@@ -14,7 +14,7 @@ alerting:
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['nix-metrics:9090']
 
   - job_name: 'node'
     static_configs:
@@ -24,7 +24,12 @@ scrape_configs:
     static_configs:
       - targets: ['nix-metrics:8080']
 
-  - job_name: 'promcontainer'
-    metrics_path: '/metrics'
+  - job_name: 'tailscale'
+    # metrics_path: '/metrics'
     static_configs:
-      - targets: ['nix-metrics:5252'] # tailscale set --webclient and tailscale metrics
+      - targets:
+        - 'nix-metrics:5252' # tailscale set --webclient and tailscale metrics
+        - 'n8n:5252'
+        - 'oi:5252'
+        - 'mini:5252'
+        - 'mb0:5252'

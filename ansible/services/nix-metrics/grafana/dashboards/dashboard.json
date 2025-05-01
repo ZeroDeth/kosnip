@@ -178,7 +178,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(tailscaled_inbound_packets_total{path=~\"$path\"}[5m])",
+          "expr": "rate(tailscaled_inbound_packets_total[5m])",
           "legendFormat": "inbound - {{path}}",
           "range": true,
           "refId": "A"
@@ -189,7 +189,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(tailscaled_outbound_packets_total{path=~\"$path\"}[5m])",
+          "expr": "rate(tailscaled_outbound_packets_total[5m])",
           "hide": false,
           "legendFormat": "outbound - {{path}}",
           "range": true,
@@ -345,16 +345,7 @@
   "tags": ["tailscale", "networking"],
   "templating": {
     "list": [
-      {
-        "allowCustomValue": false,
-        "label": "Datasource",
-        "name": "DS",
-        "options": [],
-        "query": "prometheus",
-        "refresh": 1,
-        "regex": "",
-        "type": "datasource"
-      },
+
       {
         "allowCustomValue": false,
         "current": {
