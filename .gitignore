@@ -82,3 +82,11 @@ Temporary Items
 # End of https://www.toptal.com/developers/gitignore/api/macos
 
 roles/*
+
+# Environment files
+.env
+**/.env
+
+# Keep example env files
+!.env.example
+!**/.env.example
