@@ -24,10 +24,10 @@
     vars:
       docker_compose_output_path: "/opt/metrics"
       docker_compose_generator_output_path: "/opt/metrics"
-      prometheus_user: "nobody"
-      prometheus_group: "nobody"
-      grafana_user: "{{ ansible_user_id | default('root') }}"
-      grafana_group: "{{ ansible_user_gid | default('root') }}"
+      prometheus_user_id: "65534"
+      prometheus_group_id: "65534"
+      grafana_user_id: "1000"
+      grafana_group_id: "1000"
     tasks:
       - name: Ensure /opt/metrics directory exists
         file:
@@ -55,8 +55,8 @@
           path: "{{ docker_compose_output_path }}/prometheus/data"
           state: directory
           mode: '0755'
-          owner: "{{ prometheus_user }}"
-          group: "{{ prometheus_group }}"
+          owner: "{{ prometheus_user_id }}"
+          group: "{{ prometheus_group_id }}"
         tags: [compose, config_files, metrics_config]
         
       - name: Ensure Grafana directory exists with correct permissions
@@ -64,8 +64,8 @@
           path: "{{ docker_compose_output_path }}/grafana"
           state: directory
           mode: '0755'
-          owner: "{{ grafana_user }}"
-          group: "{{ grafana_group }}"
+          owner: "{{ grafana_user_id }}"
+          group: "{{ grafana_group_id }}"
         tags: [compose, config_files, metrics_config]
     roles:
       - role: ironicbadger.docker-compose-generator
