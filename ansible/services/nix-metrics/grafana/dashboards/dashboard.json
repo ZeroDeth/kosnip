@@ -73,7 +73,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(tailscaled_inbound_bytes_total[5m]))",
+          "expr": "sum(rate(tailscaled_inbound_bytes_total{instance=~\"$host:5252\"}[5m]))",
           "legendFormat": "Inbound Bytes",
           "range": true,
           "refId": "A"
@@ -84,7 +84,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(tailscaled_outbound_bytes_total[5m]))",
+          "expr": "sum(rate(tailscaled_outbound_bytes_total{instance=~\"$host:5252\"}[5m]))",
           "legendFormat": "Outbound Bytes",
           "range": true,
           "refId": "B"
@@ -178,7 +178,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(tailscaled_inbound_packets_total[5m])",
+          "expr": "rate(tailscaled_inbound_packets_total{instance=~\"$host:5252\"}[5m])",
           "legendFormat": "inbound - {{path}}",
           "range": true,
           "refId": "A"
@@ -189,7 +189,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(tailscaled_outbound_packets_total[5m])",
+          "expr": "rate(tailscaled_outbound_packets_total{instance=~\"$host:5252\"}[5m])",
           "hide": false,
           "legendFormat": "outbound - {{path}}",
           "range": true,
@@ -257,15 +257,60 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "tailscaled_health_messages{type=\"warning\"}",
+          "expr": "tailscaled_health_messages{type=\"warning\", instance=~\"$host:5252\"} or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "repeat": null,
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "tailscaled_health_messages{type=\"warning\", instance=~\"$host:5252\"} or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
       "title": "Health Warnings",
-      "type": "stat"
+      "type": "stat",
+      "valueFontSize": "80px",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
     },
     {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "rgba(50, 172, 45, 0.97)",
+        "rgba(237, 129, 40, 0.89)",
+        "rgba(245, 54, 54, 0.9)"
+      ],
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -288,6 +333,14 @@
         },
         "overrides": []
       },
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -295,22 +348,40 @@
         "y": 8
       },
       "id": 4,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
       "pluginVersion": "11.5.1",
+      "prefix": "",
+      "prefixFontSize": "50px",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "repeat": null,
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
       "targets": [
         {
           "datasource": {
@@ -318,7 +389,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "tailscaled_advertised_routes",
+          "expr": "tailscaled_advertised_routes{instance=~\"$host:5252\"}",
           "legendFormat": "Advertised Routes",
           "range": true,
           "refId": "A"
@@ -329,7 +400,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "tailscaled_approved_routes",
+          "expr": "tailscaled_approved_routes{instance=~\"$host:5252\"}",
           "legendFormat": "Approved Routes",
           "range": true,
           "refId": "B"
@@ -345,7 +416,33 @@
   "tags": ["tailscale", "networking"],
   "templating": {
     "list": [
-
+      {
+        "current": {
+          "selected": false,
+          "text": "nix-metrics",
+          "value": "nix-metrics"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(instance)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Host",
+        "multi": false,
+        "name": "host",
+        "options": [],
+        "query": {
+          "query": "label_values(instance)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "(.*):5252",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
       {
         "allowCustomValue": false,
         "current": {
