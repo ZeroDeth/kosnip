@@ -1,0 +1,17 @@
+# ansible/services/dockge/compose.yaml
+version: "3.8"
+services:
+  dockge:
+    image: louislam/dockge:1
+    restart: unless-stopped
+    ports:
+      - "5001:5001" # Or your preferred host port
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # This will map to /opt/dockge/data on the host (see playbook changes)
+      - ./data:/app/data
+      # This allows dockge to see and manage stacks in /opt/stacks
+      - /opt/stacks:/opt/stacks
+    environment:
+      # Tells dockge where to find/create its managed stacks
+      - DOCKGE_STACKS_DIR=/opt/stacks

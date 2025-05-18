@@ -1,18 +1,52 @@
 ---
+  - hosts: all # New play for Dockge, targets all hosts
+    vars:
+      docker_compose_output_path: "/opt/dockge"
+      docker_compose_generator_output_path: "/opt/dockge"
+      # This variable tells the docker-compose-generator role to look for
+      # YAML files specifically in the 'ansible/services/dockge/' directory.
+      docker_compose_hostname: "dockge"
+    tasks:
+      - name: Ensure /opt/dockge base directory exists
+        ansible.builtin.file:
+          path: "{{ docker_compose_output_path }}"
+          state: directory
+          mode: '0755'
+        tags: [config_files, dockge_config] # ADDED dockge_config
+
+      - name: Ensure /opt/dockge/data directory exists for Dockge persistent data
+        ansible.builtin.file:
+          path: "{{ docker_compose_output_path }}/data" # Corresponds to ./data in dockge's compose.yaml
+          state: directory
+          mode: '0755' # Adjust owner/group if needed by dockge image
+        tags: [config_files, dockge_config] # ADDED dockge_config
+
+      - name: Ensure /opt/stacks directory exists for Dockge managed stacks
+        ansible.builtin.file:
+          path: /opt/stacks # This is the directory Dockge will manage
+          state: directory
+          mode: '0755'
+        tags: [config_files, dockge_config] # ADDED dockge_config
+    roles:
+      - role: ironicbadger.docker-compose-generator
+        tags: [compose, dockge_compose] # CHANGED to list and added dockge_compose
+
   - hosts: nix-llm
     vars:
-      docker_compose_output_path: "/opt/llm"
-      docker_compose_generator_output_path: "/opt/llm"
+      docker_compose_output_path: "/opt/stacks/llm"
+      docker_compose_generator_output_path: "/opt/stacks/llm"
+      # docker_compose_hostname is not set here, so it defaults to inventory_hostname 'nix-llm'
+      # The generator will look for services in 'ansible/services/nix-llm/'
     tasks:
-      - name: Ensure /opt/llm directory exists
-        file:
+      - name: Ensure /opt/stacks/llm directory exists
+        ansible.builtin.file:
           path: "{{ docker_compose_output_path }}"
           state: directory
           mode: '0755'
         tags: [compose, config_files, llm_config]
 
       - name: Copy openwebui.json file
-        copy:
+        ansible.builtin.copy:
           src: "{{ playbook_dir }}/services/nix-llm/openwebui.json"
           dest: "{{ docker_compose_output_path }}/openwebui.json"
         tags: [compose, config_files, llm_config]
@@ -22,45 +56,47 @@
 
   - hosts: nix-metrics
     vars:
-      docker_compose_output_path: "/opt/metrics"
-      docker_compose_generator_output_path: "/opt/metrics"
+      docker_compose_output_path: "/opt/stacks/metrics"
+      docker_compose_generator_output_path: "/opt/stacks/metrics"
+      # docker_compose_hostname is not set, defaults to inventory_hostname 'nix-metrics'
+      # The generator will look for services in 'ansible/services/nix-metrics/'
       prometheus_user_id: "65534"
       prometheus_group_id: "65534"
       grafana_user_id: "1000"
       grafana_group_id: "1000"
     tasks:
-      - name: Ensure /opt/metrics directory exists
-        file:
+      - name: Ensure /opt/stacks/metrics directory exists
+        ansible.builtin.file:
           path: "{{ docker_compose_output_path }}"
           state: directory
           mode: '0755'
         tags: [compose, config_files, metrics_config]
 
       - name: Copy all files and directories from nix-metrics
-        copy:
+        ansible.builtin.copy:
           src: "{{ playbook_dir }}/services/nix-metrics/"
           dest: "{{ docker_compose_output_path }}/"
           directory_mode: '0755'
         tags: [compose, config_files, metrics_config]
-        
+
       - name: Copy .env.example to .env if .env doesn't exist
-        copy:
+        ansible.builtin.copy:
           src: "{{ playbook_dir }}/services/nix-metrics/.env.example"
           dest: "{{ docker_compose_output_path }}/.env"
           force: no
         tags: [compose, config_files, metrics_config]
-        
+
       - name: Ensure Prometheus data directory exists
-        file:
+        ansible.builtin.file:
           path: "{{ docker_compose_output_path }}/prometheus/data"
           state: directory
           mode: '0755'
           owner: "{{ prometheus_user_id }}"
           group: "{{ prometheus_group_id }}"
         tags: [compose, config_files, metrics_config]
-        
+
       - name: Ensure Grafana directories exist with correct permissions
-        file:
+        ansible.builtin.file:
           path: "{{ docker_compose_output_path }}/{{ item }}"
           state: directory
           mode: '0755'
@@ -79,19 +115,20 @@
 
   - hosts: nix-komodo
     vars:
+      # This ensures the generator role looks for YAMLs in 'ansible/services/nix-komodo/'
       docker_compose_hostname: "nix-komodo"
-      docker_compose_output_path: "/opt/komodo"
-      docker_compose_generator_output_path: "/opt/komodo"
+      docker_compose_output_path: "/opt/stacks/komodo"
+      docker_compose_generator_output_path: "/opt/stacks/komodo"
     tasks:
-      - name: Ensure /opt/komodo directory exists
-        file:
+      - name: Ensure /opt/stacks/komodo directory exists
+        ansible.builtin.file:
           path: "{{ docker_compose_output_path }}"
           state: directory
           mode: '0755'
         tags: [compose, config_files, komodo_config]
 
       - name: Copy .env file
-        copy:
+        ansible.builtin.copy:
           src: "{{ playbook_dir }}/services/nix-komodo/.env"
           dest: "{{ docker_compose_output_path }}/.env"
         tags: [compose, config_files, komodo_config]
