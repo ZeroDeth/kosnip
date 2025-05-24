@@ -36,3 +36,6 @@ scrape_configs:
         - 'dokploy-00:5252'
         - 'dokploy-01:5252'
         - 'dokploy-02:5252'
+        - 'dokploy-03:5252'
+        - 'dokploy-04:5252'
+        - 'dokploy-05:5252'
