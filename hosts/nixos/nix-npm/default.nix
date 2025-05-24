@@ -17,7 +17,7 @@
   # Network configuration
   networking = {
     firewall = {
-      enable = true;
+      enable = false;
       allowedTCPPorts = [ 22 80 81 443 ]; # SSH, HTTP, NPM admin, HTTPS
     };
     hostName = "nix-npm";
