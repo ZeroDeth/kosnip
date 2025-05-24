@@ -1,5 +1,3 @@
-# ansible/services/dockge/compose.yaml
-version: "3.8"
 services:
   dockge:
     image: louislam/dockge:1
