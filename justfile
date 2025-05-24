@@ -40,6 +40,14 @@ install-komodo-02 IP:
     cd kosnip/hosts/nixos/nix-komodo-02/ && \
     sh install-nix.sh nix-komodo-02\"'"
 
+# Install NixOS on nix-npm host
+install-npm IP:
+  ssh -o "StrictHostKeyChecking no" nixos@{{IP}} "sudo bash -c '\
+    nix-shell -p git --run \"cd /root/ && \
+    git clone https://github.com/ZeroDeth/kosnip.git && \
+    cd kosnip/hosts/nixos/nix-npm/ && \
+    sh install-nix.sh nix-npm\"'"
+
 # NixOS update recipes (nixos-rebuild switch)
 # Each recipe updates NixOS configuration on a host
 hostname := `hostname | cut -d "." -f 1`
@@ -59,6 +67,10 @@ switch-komodo-01 target_host="nix-komodo-01":
 # Update NixOS configuration on nix-komodo-02 host
 switch-komodo-02 target_host="nix-komodo-02":
   sudo nixos-rebuild switch --flake .#{{target_host}}
+
+# Update NixOS configuration on nix-npm host
+switch-npm target_host="nix-npm":
+  cd hosts/nixos/nix-npm && sudo nixos-rebuild switch --flake .#{{target_host}}
 
 # Remote deployment recipes
 # Deploy NixOS configuration to remote hosts directly
@@ -80,6 +92,11 @@ deploy-komodo-01 target_host="nix-komodo-01":
 
 # Deploy to nix-komodo-02 from local machine (using SSH approach)
 deploy-komodo-02 target_host="nix-komodo-02":
+  # Clone the repository on the remote host and build there
+  ssh root@{{target_host}} "cd /root && rm -rf kosnip && git clone https://github.com/ZeroDeth/kosnip.git && cd kosnip && nixos-rebuild switch --flake .#{{target_host}}"
+
+# Deploy to nix-npm from local machine (using SSH approach)
+deploy-npm target_host="nix-npm":
   # Clone the repository on the remote host and build there
   ssh root@{{target_host}} "cd /root && rm -rf kosnip && git clone https://github.com/ZeroDeth/kosnip.git && cd kosnip && nixos-rebuild switch --flake .#{{target_host}}"
 
@@ -111,6 +128,10 @@ metrics-config HOST *V:
 # Copy Komodo configuration files to remote hosts
 komodo-config HOST *V:
   cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags komodo_config {{V}}
+
+# Copy NPM configuration files to remote host
+npm-config HOST *V:
+  cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags npm_config {{V}}
 
 # Deploy Dockge configuration and compose files to remote host(s)
 dockge-deploy HOST *V:

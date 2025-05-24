@@ -112,7 +112,42 @@
     roles:
       - role: ironicbadger.docker-compose-generator
         tags: compose
+  - hosts: nix-npm
+    vars:
+      docker_compose_output_path: "/opt/stacks/npm"
+      docker_compose_generator_output_path: "/opt/stacks/npm"
+      docker_compose_hostname: "nix-npm" # Ensures service files are read from ansible/services/nix-npm/
+    tasks:
+      - name: Ensure /opt/stacks/npm base directory exists
+        ansible.builtin.file:
+          path: "{{ docker_compose_output_path }}"
+          state: directory
+          mode: '0755'
+        tags: [compose, config_files, npm_config]
 
+      - name: Copy .env.example to .env for nix-npm if .env doesn't exist
+        ansible.builtin.copy:
+          src: "{{ playbook_dir }}/services/nix-npm/.env.example"
+          dest: "{{ docker_compose_output_path }}/.env"
+          force: no
+        tags: [compose, config_files, npm_config]
+
+      - name: Ensure Nginx Proxy Manager data directory exists
+        ansible.builtin.file:
+          path: "{{ docker_compose_output_path }}/data"
+          state: directory
+          mode: '0755'
+        tags: [compose, config_files, npm_config]
+
+      - name: Ensure Nginx Proxy Manager letsencrypt directory exists
+        ansible.builtin.file:
+          path: "{{ docker_compose_output_path }}/letsencrypt"
+          state: directory
+          mode: '0755'
+        tags: [compose, config_files, npm_config]
+    roles:
+      - role: ironicbadger.docker-compose-generator
+        tags: compose
   - hosts: nix-komodo
     vars:
       # This ensures the generator role looks for YAMLs in 'ansible/services/nix-komodo/'
