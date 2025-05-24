@@ -39,3 +39,4 @@ scrape_configs:
         - 'dokploy-03:5252'
         - 'dokploy-04:5252'
         - 'dokploy-05:5252'
+        - 'nix-npm:5252'
