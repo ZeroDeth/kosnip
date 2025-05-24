@@ -20,6 +20,11 @@
           hostname = "nix-metrics";
           username = "zerodeth";
         };
+        nix-npm = libx.mkNixos {
+          system = "x86_64-linux";
+          hostname = "nix-npm";
+          username = "zerodeth";
+        };
         nix-komodo-01 = libx.mkNixos {
           system = "x86_64-linux";
           hostname = "nix-komodo-01";
