@@ -111,3 +111,7 @@ metrics-config HOST *V:
 # Copy Komodo configuration files to remote hosts
 komodo-config HOST *V:
   cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags komodo_config {{V}}
+
+# Deploy Dockge configuration and compose files to remote host(s)
+dockge-deploy HOST *V:
+  cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags dockge_config,dockge_compose {{V}}
