@@ -16,7 +16,10 @@
 
   # Network configuration
   networking = {
-    firewall.enable = false;
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 22 80 81 443 ]; # SSH, HTTP, NPM admin, HTTPS
+    };
     hostName = "nix-npm";
     interfaces.ens18 = {
       useDHCP = false;
