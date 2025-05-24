@@ -112,6 +112,7 @@
     roles:
       - role: ironicbadger.docker-compose-generator
         tags: compose
+
   - hosts: nix-npm
     vars:
       docker_compose_output_path: "/opt/stacks/npm"
@@ -148,6 +149,7 @@
     roles:
       - role: ironicbadger.docker-compose-generator
         tags: compose
+
   - hosts: nix-komodo
     vars:
       # This ensures the generator role looks for YAMLs in 'ansible/services/nix-komodo/'
