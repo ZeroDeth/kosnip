@@ -16,26 +16,27 @@ Welcome to the Kosnip documentation! This directory contains comprehensive guide
 
 #### Essential Commands
 ```bash
-# Show all available tasks
+# Show all tasks
 task --list
 
-# List configured hosts
-task list-hosts
-
-# Development shortcuts
+# Show development shortcuts
 task dev
+
+# List all hosts
+task list-hosts
 ```
 
 #### Common Workflows
 ```bash
-# Install new host
-task install:hostname IP=x.x.x.x
+# Install new host (requires both HOST and IP during initial setup)
+task install HOST=nix-llm IP=192.168.1.100
 
-# Deploy services
-task deploy:hostname
+# Deploy services to existing hosts
+task deploy:nix-llm
+task deploy:nix-metrics
 
 # Update configuration
-task update HOST=hostname
+task update HOST=nix-llm
 ```
 
 ## 🎯 Getting Started
