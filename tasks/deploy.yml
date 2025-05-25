@@ -90,7 +90,11 @@ tasks:
   all:
     desc: Deploy to all hosts
     summary: |
-      Deploy services to all hosts
+      Deploy each host's specific services to all hosts:
+      - nix-llm: LLM services (Open WebUI, Ollama)
+      - nix-metrics: Monitoring (Prometheus, Grafana)
+      - nix-komodo-01/02: Komodo trading platform
+      - nix-npm: Nginx Proxy Manager
       Usage: task deploy:all [VERBOSE=true]
     vars:
       VERBOSE: '{{.VERBOSE | default "false"}}'

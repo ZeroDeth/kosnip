@@ -206,12 +206,6 @@ tasks:
       - for: { var: NIXOS_HOSTS, split: ' ' }
         cmd: task update HOST={{.ITEM}}
 
-  compose-all:
-    desc: Deploy Docker Compose to all hosts
-    cmds:
-      - for: { var: NIXOS_HOSTS, split: ' ' }
-        cmd: task compose HOST={{.ITEM}}
-
   # Utility tasks
   fmt:
     desc: Format Nix files
