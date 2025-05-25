@@ -27,6 +27,13 @@
           state: directory
           mode: '0755'
         tags: [config_files, dockge_config] # ADDED dockge_config
+
+      - name: Copy .env.example to .env for Dockge if .env doesn't exist
+        ansible.builtin.copy:
+          src: "{{ playbook_dir }}/services/dockge/.env.example"
+          dest: "{{ docker_compose_output_path }}/.env"
+          force: no # Only copy if .env doesn't already exist
+        tags: [config_files, dockge_config]
     roles:
       - role: ironicbadger.docker-compose-generator
         tags: [compose, dockge_compose] # CHANGED to list and added dockge_compose
