@@ -128,6 +128,8 @@ tasks:
     preconditions:
       - sh: '[ -n "{{.HOST}}" ]'
         msg: 'HOST is required'
+      - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
+        msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
     cmds:
       - cd {{.ANSIBLE_DIR}} && ansible-playbook playbook.yaml --limit {{.HOST}} --tags compose {{.ANSIBLE_VERBOSE}}
 
@@ -146,6 +148,8 @@ tasks:
     preconditions:
       - sh: '[ -n "{{.HOST}}" ]'
         msg: 'HOST is required'
+      - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
+        msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
     cmds:
       - cd {{.ANSIBLE_DIR}} && ansible-playbook playbook.yaml --limit {{.HOST}} --tags {{.CONFIG_TAG}} {{.ANSIBLE_VERBOSE}}
 
@@ -163,6 +167,8 @@ tasks:
     preconditions:
       - sh: '[ -n "{{.HOST}}" ]'
         msg: 'HOST is required'
+      - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
+        msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
     cmds:
       - cd {{.ANSIBLE_DIR}} && ansible-playbook playbook.yaml --limit {{.HOST}} --tags dockge_config,dockge_compose {{.ANSIBLE_VERBOSE}}
 
