@@ -121,15 +121,30 @@ The system automatically discovers hosts from the `hosts/nixos/` directory:
 
 ## Usage Examples
 
-### Installing a New Host
+### Installation Workflow
+
+Installing NixOS on a new host requires both `HOST` and `IP` parameters since the host doesn't exist in your inventory yet:
 
 ```bash
 # Install NixOS on a new host
-task install:nix-llm IP=192.168.1.100
-
-# Or use the generic install task
 task install HOST=nix-llm IP=192.168.1.100
+
+# Or use host-specific shortcuts
+task install:nix-llm IP=192.168.1.100
 ```
+
+**Why both HOST and IP are required:**
+- **HOST**: Determines which NixOS configuration to install (flake target)
+- **IP**: Target machine's IP address for SSH connection during installation
+- After installation, the host will be accessible by hostname through your network/DNS
+
+**Installation Process:**
+1. Connects to target IP via SSH
+2. Clones the repository to the target machine
+3. Runs disk partitioning with disko
+4. Generates hardware configuration
+5. Installs NixOS with the specified host configuration
+6. Provides next steps for post-installation setup
 
 ### Deploying Services
 

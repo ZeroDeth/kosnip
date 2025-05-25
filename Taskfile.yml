@@ -38,14 +38,18 @@ tasks:
       Install NixOS on a remote host via SSH
       Usage: task install HOST=<hostname> IP=<ip_address>
       Example: task install HOST=nix-llm IP=192.168.1.100
+      
+      During initial installation, you need both HOST and IP since the host
+      doesn't exist in your inventory yet. After installation, you can use
+      the hostname-specific shortcuts like 'task deploy:nix-llm'.
     vars:
-      HOST: '{{.HOST | default ""}}'
+      HOST: '{{.HOST}}'
       IP: '{{.IP | default ""}}'
     preconditions:
-      - sh: '[ -n "{{.HOST}}" ]'
-        msg: 'HOST variable is required. Usage: task install HOST=<hostname> IP=<ip_address>'
       - sh: '[ -n "{{.IP}}" ]'
         msg: 'IP variable is required. Usage: task install HOST=<hostname> IP=<ip_address>'
+      - sh: '[ -n "{{.HOST}}" ]'
+        msg: 'HOST is required'
       - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
         msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
     cmds:
@@ -87,6 +91,11 @@ tasks:
           echo \"✅ NixOS installation completed for {{.HOST}}!\"
         '"
       - echo "✅ Installation completed! Host {{.HOST}} should now be ready to boot."
+      - echo "💡 Next steps:"
+      - echo "   1. Reboot the host and ensure it comes up with the new NixOS installation"
+      - echo "   2. Add the host to your SSH config or ansible/hosts.ini if not already present"
+      - echo "   3. Deploy services with \"task deploy:HOST_NAME\""
+      - echo ""
 
   # NixOS Update Tasks (Dynamic)
   update:
@@ -96,10 +105,10 @@ tasks:
       Usage: task update HOST=<hostname>
       Example: task update HOST=nix-llm
     vars:
-      HOST: '{{.HOST | default ""}}'
+      HOST: '{{.HOST}}'
     preconditions:
       - sh: '[ -n "{{.HOST}}" ]'
-        msg: 'HOST variable is required. Usage: task update HOST=<hostname>'
+        msg: 'HOST is required'
       - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
         msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
     cmds:
@@ -113,12 +122,12 @@ tasks:
       Usage: task compose HOST=<hostname> [VERBOSE=true]
       Example: task compose HOST=nix-npm VERBOSE=true
     vars:
-      HOST: '{{.HOST | default ""}}'
+      HOST: '{{.HOST}}'
       VERBOSE: '{{.VERBOSE | default "false"}}'
       ANSIBLE_VERBOSE: '{{if eq .VERBOSE "true"}}-vvvv{{else}}{{end}}'
     preconditions:
       - sh: '[ -n "{{.HOST}}" ]'
-        msg: 'HOST variable is required. Usage: task compose HOST=<hostname>'
+        msg: 'HOST is required'
     cmds:
       - cd {{.ANSIBLE_DIR}} && ansible-playbook playbook.yaml --limit {{.HOST}} --tags compose {{.ANSIBLE_VERBOSE}}
 
@@ -130,13 +139,13 @@ tasks:
       Usage: task config HOST=<hostname> [VERBOSE=true]
       Example: task config HOST=nix-npm VERBOSE=true
     vars:
-      HOST: '{{.HOST | default ""}}'
+      HOST: '{{.HOST}}'
       VERBOSE: '{{.VERBOSE | default "false"}}'
       ANSIBLE_VERBOSE: '{{if eq .VERBOSE "true"}}-vvvv{{else}}{{end}}'
       CONFIG_TAG: '{{.HOST | replace "nix-" "" | replace "-" "_"}}_config'
     preconditions:
       - sh: '[ -n "{{.HOST}}" ]'
-        msg: 'HOST variable is required. Usage: task config HOST=<hostname>'
+        msg: 'HOST is required'
     cmds:
       - cd {{.ANSIBLE_DIR}} && ansible-playbook playbook.yaml --limit {{.HOST}} --tags {{.CONFIG_TAG}} {{.ANSIBLE_VERBOSE}}
 
@@ -148,12 +157,12 @@ tasks:
       Usage: task dockge HOST=<hostname> [VERBOSE=true]
       Example: task dockge HOST=nix-npm VERBOSE=true
     vars:
-      HOST: '{{.HOST | default ""}}'
+      HOST: '{{.HOST}}'
       VERBOSE: '{{.VERBOSE | default "false"}}'
       ANSIBLE_VERBOSE: '{{if eq .VERBOSE "true"}}-vvvv{{else}}{{end}}'
     preconditions:
       - sh: '[ -n "{{.HOST}}" ]'
-        msg: 'HOST variable is required. Usage: task dockge HOST=<hostname>'
+        msg: 'HOST is required'
     cmds:
       - cd {{.ANSIBLE_DIR}} && ansible-playbook playbook.yaml --limit {{.HOST}} --tags dockge_config,dockge_compose {{.ANSIBLE_VERBOSE}}
 
@@ -247,7 +256,7 @@ tasks:
       - echo "  task list-hosts     - List all available hosts"
       - echo "  task compose HOST=hostname - Deploy services to host"
       - echo "  task update HOST=hostname  - Update NixOS config"
-      - echo "  task install HOST=hostname IP=ip - Install NixOS"
+      - echo "  task install HOST=hostname IP=ip_address - Install NixOS"
       - echo ""
       - echo "Code quality:"
       - echo "  task fmt            - Format Nix files"

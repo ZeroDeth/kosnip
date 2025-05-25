@@ -16,12 +16,16 @@ task list-hosts
 ## 🏗 Installation
 
 ```bash
-# Install NixOS on specific hosts
+# Install NixOS on specific hosts (requires both HOST and IP during initial setup)
+task install HOST=nix-llm IP=192.168.1.100
+task install HOST=nix-metrics IP=192.168.1.101
+task install HOST=nix-komodo-01 IP=192.168.1.102
+task install HOST=nix-komodo-02 IP=192.168.1.103
+task install HOST=nix-npm IP=192.168.1.104
+
+# Alternative: Use host-specific shortcuts (also require IP during installation)
 task install:nix-llm IP=192.168.1.100
 task install:nix-metrics IP=192.168.1.101
-task install:nix-komodo-01 IP=192.168.1.102
-task install:nix-komodo-02 IP=192.168.1.103
-task install:nix-npm IP=192.168.1.104
 ```
 
 ## 🚢 Deployment
