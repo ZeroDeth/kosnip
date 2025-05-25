@@ -49,12 +49,44 @@ tasks:
       - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
         msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
     cmds:
+      - echo "🚀 Installing NixOS on {{.HOST}} ({{.IP}})..."
       - |
         ssh -o "StrictHostKeyChecking no" nixos@{{.IP}} "sudo bash -c '
-          nix-shell -p git --run \"cd /root/ && 
-          git clone https://github.com/ZeroDeth/kosnip.git && 
-          cd kosnip/hosts/nixos/{{.HOST}}/ && 
-          sh install-nix.sh {{.HOST}}\"'"
+          echo \"📦 Setting up Nix environment...\"
+          
+          # Check if running as root
+          if [ \"\$EUID\" -ne 0 ]; then
+            echo \"❌ This script must be run as root\"
+            exit 1
+          fi
+          
+          # Clone repository if not exists
+          if [ ! -d \"/root/kosnip\" ]; then
+            echo \"📥 Cloning repository...\"
+            nix-shell -p git --run \"cd /root/ && git clone https://github.com/ZeroDeth/kosnip.git\"
+          else
+            echo \"🔄 Updating existing repository...\"
+            cd /root/kosnip && git pull
+          fi
+          
+          cd /root/kosnip/hosts/nixos/{{.HOST}}/
+          
+          echo \"💾 Partitioning disk with disko...\"
+          nix --experimental-features \"nix-command flakes\" run github:nix-community/disko -- --mode disko ../../common/disko.nix
+          
+          echo \"⚙️  Generating hardware configuration...\"
+          nixos-generate-config --no-filesystems --root /mnt
+          
+          echo \"📋 Copying hardware configuration...\"
+          cp ../../common/hardware-configuration.nix /mnt/etc/nixos/
+          
+          echo \"🔧 Installing NixOS for {{.HOST}}...\"
+          export NIXPKGS_ALLOW_UNFREE=1
+          nixos-install --root /mnt --flake .#{{.HOST}} --impure
+          
+          echo \"✅ NixOS installation completed for {{.HOST}}!\"
+        '"
+      - echo "✅ Installation completed! Host {{.HOST}} should now be ready to boot."
 
   # NixOS Update Tasks (Dynamic)
   update:
@@ -166,16 +198,46 @@ tasks:
         cmd: task compose HOST={{.ITEM}}
 
   # Utility tasks
-  lint:
+  fmt:
     desc: Format Nix files
     cmds:
       - nixpkgs-fmt .
+
+  check:
+    desc: Check Nix flake configuration
+    cmds:
+      - nix flake check
+
+  validate:
+    desc: Format and validate Nix files
+    summary: |
+      Format Nix files and validate flake configuration
+      Usage: task validate
+    cmds:
+      - task: fmt
+      - task: check
+
+  lint:
+    desc: Format Nix files (alias for fmt)
+    cmds:
+      - task: fmt
 
   clean:
     desc: Clean up temporary files
     cmds:
       - find . -name "*.tmp" -delete
       - find . -name ".DS_Store" -delete
+
+  clean-install-scripts:
+    desc: Remove old install scripts (now integrated into Taskfile)
+    summary: |
+      Remove the individual install-nix.sh scripts from each host directory
+      since the installation logic is now integrated into the Taskfile
+      Usage: task clean-install-scripts
+    prompt: This will delete all install-nix.sh scripts. Continue?
+    cmds:
+      - find hosts/nixos -name "install-nix.sh" -delete
+      - echo "✅ Removed old install scripts. Installation now handled by 'task install HOST=<host> IP=<ip>'"
 
   # Development helpers
   dev:
@@ -186,6 +248,12 @@ tasks:
       - echo "  task compose HOST=hostname - Deploy services to host"
       - echo "  task update HOST=hostname  - Update NixOS config"
       - echo "  task install HOST=hostname IP=ip - Install NixOS"
+      - echo ""
+      - echo "Code quality:"
+      - echo "  task fmt            - Format Nix files"
+      - echo "  task check          - Check Nix flake"
+      - echo "  task validate       - Format and validate"
+      - echo "  task clean          - Clean temporary files"
       - echo ""
       - echo "Documentation:"
       - echo "  task docs           - Open main documentation"

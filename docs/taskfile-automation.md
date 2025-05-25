@@ -92,9 +92,12 @@ kosnip/
 
 | Task | Description | Usage |
 |------|-------------|-------|
+| `task fmt` | Format Nix files | `task fmt` |
+| `task check` | Check Nix flake configuration | `task check` |
+| `task validate` | Format and validate Nix files | `task validate` |
+| `task lint` | Format Nix files (alias for fmt) | `task lint` |
 | `task show-settings` | Show system settings and status | `task show-settings HOST=nix-llm` |
 | `task sub-update` | Update git submodules | `task sub-update` |
-| `task lint` | Format Nix files | `task lint` |
 | `task clean` | Clean up temporary files | `task clean` |
 
 ## Host Configuration
@@ -216,30 +219,42 @@ The Taskfile integrates seamlessly with the existing Ansible infrastructure:
 - **Host Limiting**: Automatically limits Ansible execution to specified hosts
 - **Configuration Management**: Handles both service deployment and configuration updates
 
-## Troubleshooting
+## Migration from Shell Scripts
 
-### Common Issues
+### Install Script Consolidation
 
-1. **Task not found**: Ensure Task is installed and in your PATH
-2. **Host not found**: Check that the host directory exists in `hosts/nixos/`
-3. **SSH connection issues**: Verify SSH access to target hosts
-4. **Ansible errors**: Use `VERBOSE=true` for detailed error output
+Previously, each host had its own `install-nix.sh` script with nearly identical content. These have been **consolidated into the Taskfile** for better maintainability:
 
-### Debugging Commands
+**Before (per-host scripts):**
+```bash
+# Each host had: hosts/nixos/nix-llm/install-nix.sh
+cd hosts/nixos/nix-llm/
+sh install-nix.sh
+```
+
+**After (unified Taskfile):**
+```bash
+# Single command for any host
+task install HOST=nix-llm IP=192.168.1.100
+```
+
+### Benefits of Integration
+
+- **Single source of truth**: All installation logic in one place
+- **Better error handling**: Improved logging and status messages  
+- **Automatic updates**: Repository is updated before installation
+- **Consistent process**: Same steps for all hosts
+- **Cleaner codebase**: No duplicate shell scripts
+
+### Cleanup Old Scripts
+
+If you want to remove the old install scripts:
 
 ```bash
-# Check Task installation
-task --version
-
-# List all available tasks
-task --list
-
-# Show task summary
-task --summary deploy:nix-npm
-
-# Dry run to see what would be executed
-task deploy:nix-npm -n
+task clean-install-scripts
 ```
+
+This will delete all `install-nix.sh` files since they're now redundant.
 
 ## Migration from Justfile
 
@@ -274,3 +289,27 @@ When adding new tasks or hosts:
 - [Task Documentation](https://taskfile.dev/)
 - [Ansible Documentation](https://docs.ansible.com/)
 - [NixOS Manual](https://nixos.org/manual/nixos/stable/)
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Task not found**: Ensure Task is installed and in your PATH
+2. **Host not found**: Check that the host directory exists in `hosts/nixos/`
+3. **SSH connection issues**: Verify SSH access to target hosts
+4. **Ansible errors**: Use `VERBOSE=true` for detailed error output
+
+### Debugging Commands
+
+```bash
+# Check Task installation
+task --version
+
+# List all available tasks
+task --list
+
+# Show task summary
+task --summary deploy:nix-npm
+
+# Dry run to see what would be executed
+task deploy:nix-npm -n

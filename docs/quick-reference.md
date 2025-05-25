@@ -56,17 +56,17 @@ task dockge HOST=nix-npm
 ## 🔧 Utilities
 
 ```bash
-# Show system status
+# Code quality
+task fmt                      # Format Nix files
+task check                    # Check Nix flake
+task validate                 # Format and validate
+task lint                     # Format Nix files (alias)
+
+# System utilities
 task show-settings HOST=nix-llm
-
-# Clean temporary files
-task clean
-
-# Format Nix files
-task lint
-
-# Update submodules
-task sub-update
+task clean                    # Clean temporary files
+task clean-install-scripts    # Remove old install scripts
+task sub-update               # Update submodules
 ```
 
 ## 📚 Documentation
