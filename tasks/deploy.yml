@@ -1,0 +1,116 @@
+version: '3'
+
+# Deployment-specific tasks for each host
+tasks:
+  # LLM host deployment
+  nix-llm:
+    desc: Deploy services to nix-llm host
+    summary: |
+      Deploy LLM services (Open WebUI, Ollama) to nix-llm host
+      Usage: task deploy:nix-llm [VERBOSE=true]
+    vars:
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+    cmds:
+      - task: :compose
+        vars:
+          HOST: nix-llm
+          VERBOSE: '{{.VERBOSE}}'
+
+  # Metrics host deployment
+  nix-metrics:
+    desc: Deploy services to nix-metrics host
+    summary: |
+      Deploy monitoring services (Prometheus, Grafana) to nix-metrics host
+      Usage: task deploy:nix-metrics [VERBOSE=true]
+    vars:
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+    cmds:
+      - task: :compose
+        vars:
+          HOST: nix-metrics
+          VERBOSE: '{{.VERBOSE}}'
+
+  # Komodo hosts deployment
+  nix-komodo-01:
+    desc: Deploy services to nix-komodo-01 host
+    summary: |
+      Deploy Komodo services to nix-komodo-01 host
+      Usage: task deploy:nix-komodo-01 [VERBOSE=true]
+    vars:
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+    cmds:
+      - task: :compose
+        vars:
+          HOST: nix-komodo-01
+          VERBOSE: '{{.VERBOSE}}'
+
+  nix-komodo-02:
+    desc: Deploy services to nix-komodo-02 host
+    summary: |
+      Deploy Komodo services to nix-komodo-02 host
+      Usage: task deploy:nix-komodo-02 [VERBOSE=true]
+    vars:
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+    cmds:
+      - task: :compose
+        vars:
+          HOST: nix-komodo-02
+          VERBOSE: '{{.VERBOSE}}'
+
+  # NPM host deployment
+  nix-npm:
+    desc: Deploy services to nix-npm host
+    summary: |
+      Deploy Nginx Proxy Manager to nix-npm host
+      Usage: task deploy:nix-npm [VERBOSE=true]
+    vars:
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+    cmds:
+      - task: :compose
+        vars:
+          HOST: nix-npm
+          VERBOSE: '{{.VERBOSE}}'
+
+  # Batch deployments
+  komodo:
+    desc: Deploy to all Komodo hosts
+    summary: |
+      Deploy Komodo services to both nix-komodo-01 and nix-komodo-02
+      Usage: task deploy:komodo [VERBOSE=true]
+    vars:
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+    cmds:
+      - task: nix-komodo-01
+        vars:
+          VERBOSE: '{{.VERBOSE}}'
+      - task: nix-komodo-02
+        vars:
+          VERBOSE: '{{.VERBOSE}}'
+
+  all:
+    desc: Deploy to all hosts
+    summary: |
+      Deploy each host's specific services to all hosts:
+      - nix-llm: LLM services (Open WebUI, Ollama)
+      - nix-metrics: Monitoring (Prometheus, Grafana)
+      - nix-komodo-01/02: Komodo trading platform
+      - nix-npm: Nginx Proxy Manager
+      Usage: task deploy:all [VERBOSE=true]
+    vars:
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+    cmds:
+      - task: nix-llm
+        vars:
+          VERBOSE: '{{.VERBOSE}}'
+      - task: nix-metrics
+        vars:
+          VERBOSE: '{{.VERBOSE}}'
+      - task: nix-komodo-01
+        vars:
+          VERBOSE: '{{.VERBOSE}}'
+      - task: nix-komodo-02
+        vars:
+          VERBOSE: '{{.VERBOSE}}'
+      - task: nix-npm
+        vars:
+          VERBOSE: '{{.VERBOSE}}'
