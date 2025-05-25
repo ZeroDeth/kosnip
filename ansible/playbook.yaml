@@ -12,31 +12,31 @@
           path: "{{ docker_compose_output_path }}"
           state: directory
           mode: '0755'
-        tags: [config_files, dockge_config] # ADDED dockge_config
+        tags: [config_files, dockge_config, compose]
 
       - name: Ensure /opt/dockge/data directory exists for Dockge persistent data
         ansible.builtin.file:
           path: "{{ docker_compose_output_path }}/data" # Corresponds to ./data in dockge's compose.yaml
           state: directory
           mode: '0755' # Adjust owner/group if needed by dockge image
-        tags: [config_files, dockge_config] # ADDED dockge_config
+        tags: [config_files, dockge_config, compose]
 
       - name: Ensure /opt/stacks directory exists for Dockge managed stacks
         ansible.builtin.file:
           path: /opt/stacks # This is the directory Dockge will manage
           state: directory
           mode: '0755'
-        tags: [config_files, dockge_config] # ADDED dockge_config
+        tags: [config_files, dockge_config, compose]
 
       - name: Copy .env.example to .env for Dockge if .env doesn't exist
         ansible.builtin.copy:
           src: "{{ playbook_dir }}/services/dockge/.env.example"
           dest: "{{ docker_compose_output_path }}/.env"
           force: no # Only copy if .env doesn't already exist
-        tags: [config_files, dockge_config]
+        tags: [config_files, dockge_config, compose]
     roles:
       - role: ironicbadger.docker-compose-generator
-        tags: [compose, dockge_compose] # CHANGED to list and added dockge_compose
+        tags: [compose, dockge_compose]
 
   - hosts: nix-llm
     vars:
@@ -155,7 +155,7 @@
         tags: [compose, config_files, npm_config]
     roles:
       - role: ironicbadger.docker-compose-generator
-        tags: compose
+        tags: [compose, npm_config]
 
   - hosts: nix-komodo
     vars:
