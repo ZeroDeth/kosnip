@@ -18,5 +18,12 @@
     "titleBar.inactiveBackground": "#382df799",
     "titleBar.inactiveForeground": "#e7e7e799"
   },
-  "peacock.color": "#382df7"
+  "peacock.color": "#382df7",
+  "yaml.schemas": {
+    "file:///Users/zerodeth/.windsurf/extensions/atlassian.atlascode-3.4.22-universal/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+    "https://taskfile.dev/schema.json": [
+      "file:///Users/zerodeth/Projects/kosnip/tasks/deploy.yml",
+      "file:///Users/zerodeth/Projects/kosnip/tasks/install.yml"
+    ]
+  }
 }
