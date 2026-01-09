@@ -27,7 +27,7 @@ Before you begin, ensure you have the following:
 - **Cloudflare API Token:** An API token from Cloudflare with permissions to edit DNS records for your chosen domain.
   - Permissions required: `Zone:Zone:Read`, `Zone:DNS:Edit` for the specific zone.
 - **Domain Name:** A registered domain name managed through Cloudflare.
-- **Project Repository:** Access to this project repository, as it contains the necessary NixOS configurations and `justfile` recipes.
+- **Project Repository:** Access to this project repository, as it contains the necessary NixOS configurations and Taskfile automation.
 
 ---
 
@@ -187,8 +187,8 @@ NPM on `nix-npm` can proxy requests to other services on your tailnet.
 
 ## Configuration Management
 
-1.  **Deploying Configuration via `just`:**
-    *   The `just npm-config nix-npm` command (if you've added it to the `justfile` based on patterns like `llm-config`) can be used to trigger an Ansible run that copies configuration files (like `.env`) to the `nix-npm` host.
+1.  **Deploying Configuration via Taskfile:**
+    *   The `task config HOST=nix-npm` command can be used to trigger an Ansible run that copies configuration files (like `.env`) to the `nix-npm` host.
     *   The Ansible playbook for `nix-npm` (in [`ansible/playbook.yaml`](ansible/playbook.yaml:0)) should define tasks tagged with `npm_config` to handle this.
 
 2.  **Environment Variables & Secrets:**
@@ -259,7 +259,7 @@ NPM on `nix-npm` can proxy requests to other services on your tailnet.
 -   [Tailscale Documentation](https://tailscale.com/kb/)
 -   [Cloudflare API Token Documentation](https://developers.cloudflare.com/api/tokens/)
 -   [Let's Encrypt Documentation](https://letsencrypt.org/docs/)
--   Project `justfile`: [`justfile`](../../justfile:0)
+-   Project `Taskfile`: [`Taskfile.yml`](../../Taskfile.yml:0)
 -   Project Ansible Playbook: [`ansible/playbook.yaml`](../../ansible/playbook.yaml:0)
 -   `nix-npm` Host Configuration: [`hosts/nixos/nix-npm/`](../../hosts/nixos/nix-npm/:0)
 -   `nix-npm` Service Configuration: [`ansible/services/nix-npm/`](../../ansible/services/nix-npm/:0)

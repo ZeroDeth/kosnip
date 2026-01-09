@@ -1,0 +1,84 @@
+version: '3'
+
+# Installation-specific tasks
+tasks:
+  # Individual host installation tasks (auto-generated)
+  nix-llm:
+    desc: Install NixOS on nix-llm host
+    summary: |
+      Install NixOS on nix-llm host
+      Usage: task install:nix-llm IP=<ip_address>
+    vars:
+      IP: '{{.IP | default ""}}'
+    preconditions:
+      - sh: '[ -n "{{.IP}}" ]'
+        msg: 'IP variable is required. Usage: task install:nix-llm IP=<ip_address>'
+    cmds:
+      - task: :install
+        vars:
+          HOST: nix-llm
+          IP: '{{.IP}}'
+
+  nix-metrics:
+    desc: Install NixOS on nix-metrics host
+    summary: |
+      Install NixOS on nix-metrics host
+      Usage: task install:nix-metrics IP=<ip_address>
+    vars:
+      IP: '{{.IP | default ""}}'
+    preconditions:
+      - sh: '[ -n "{{.IP}}" ]'
+        msg: 'IP variable is required. Usage: task install:nix-metrics IP=<ip_address>'
+    cmds:
+      - task: :install
+        vars:
+          HOST: nix-metrics
+          IP: '{{.IP}}'
+
+  nix-komodo-01:
+    desc: Install NixOS on nix-komodo-01 host
+    summary: |
+      Install NixOS on nix-komodo-01 host
+      Usage: task install:nix-komodo-01 IP=<ip_address>
+    vars:
+      IP: '{{.IP | default ""}}'
+    preconditions:
+      - sh: '[ -n "{{.IP}}" ]'
+        msg: 'IP variable is required. Usage: task install:nix-komodo-01 IP=<ip_address>'
+    cmds:
+      - task: :install
+        vars:
+          HOST: nix-komodo-01
+          IP: '{{.IP}}'
+
+  nix-komodo-02:
+    desc: Install NixOS on nix-komodo-02 host
+    summary: |
+      Install NixOS on nix-komodo-02 host
+      Usage: task install:nix-komodo-02 IP=<ip_address>
+    vars:
+      IP: '{{.IP | default ""}}'
+    preconditions:
+      - sh: '[ -n "{{.IP}}" ]'
+        msg: 'IP variable is required. Usage: task install:nix-komodo-02 IP=<ip_address>'
+    cmds:
+      - task: :install
+        vars:
+          HOST: nix-komodo-02
+          IP: '{{.IP}}'
+
+  nix-npm:
+    desc: Install NixOS on nix-npm host
+    summary: |
+      Install NixOS on nix-npm host
+      Usage: task install:nix-npm IP=<ip_address>
+    vars:
+      IP: '{{.IP | default ""}}'
+    preconditions:
+      - sh: '[ -n "{{.IP}}" ]'
+        msg: 'IP variable is required. Usage: task install:nix-npm IP=<ip_address>'
+    cmds:
+      - task: :install
+        vars:
+          HOST: nix-npm
+          IP: '{{.IP}}'
