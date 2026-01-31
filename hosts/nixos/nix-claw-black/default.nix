@@ -13,9 +13,9 @@
   bot = {
     enable = true;
     name = "black";
-    owner = "zerodeth";
-    project = "black";
-    environment = "dev";
+    owner = "clawzero";
+    project = "black-claw";
+    environment = "dev_black";
     enablePlugins = [ "sag" ];
   };
 }

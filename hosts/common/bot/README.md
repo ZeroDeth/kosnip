@@ -15,13 +15,25 @@ Standardized configuration for all bots. **No exceptions.**
   bot = {
     enable = true;
     name = "black";
-    owner = "zerodeth";
-    project = "black";
-    environment = "dev";
+    owner = "clawzero";
+    project = "black-claw";
+    environment = "dev_black";
     enablePlugins = [ "sag" ];
   };
 }
 ```
+
+## Naming Convention
+
+| Component | Pattern | Example |
+|-----------|---------|---------|
+| Machine name | `{name}` | `black` |
+| Hostname | `{name}` | `black` |
+| User | `{name}` | `black` |
+| SSH/GPG keys | `{name}-claw` | `black-claw` |
+| Doppler workspace | `claw` | `claw` |
+| Doppler project | `{name}-claw` | `black-claw` |
+| Doppler env | `dev_{name}` | `dev_black` |
 
 ## Standard Paths (all bots)
 
@@ -35,11 +47,12 @@ Standardized configuration for all bots. **No exceptions.**
 
 ## Doppler (all bots)
 
-| Variable | Source |
-|----------|--------|
-| `DOPPLER_ENVIRONMENT` | bot.environment |
-| `DOPPLER_PROJECT` | bot.project |
-| `DOPPLER_CONFIG` | bot.environment |
+| Variable | Value | Example |
+|----------|-------|---------|
+| `DOPPLER_WORKSPACE` | `claw` | `claw` |
+| `DOPPLER_PROJECT` | `{name}-claw` | `black-claw` |
+| `DOPPLER_ENVIRONMENT` | `dev_{name}` | `dev_black` |
+| `DOPPLER_CONFIG` | `dev_{name}` | `dev_black` |
 
 ## First-Party Plugins
 
@@ -47,11 +60,23 @@ Standardized configuration for all bots. **No exceptions.**
 |--------|---------|
 | `sag` (TTS) | Enabled |
 
+## SSH & GPG Keys
+
+Keys stored in GitHub, pulled during initial setup:
+- SSH key: `id_ed25519-{name}-claw`
+- GPG key: `{name}-claw.asc`
+
+Setup script pulls keys from:
+```
+https://github.com/clawzero/dotfiles/raw/main/keys/{name}-claw/*
+```
+
 ## Included by Preset
 
 - Tailscale mesh networking
 - OpenClaw via nix-openclaw
 - Systemd service
-- User configuration
+- Doppler integration
+- User `{name}` (not zerodeth)
 - Standard directories
 - Base packages (tailscale, git, doppler)

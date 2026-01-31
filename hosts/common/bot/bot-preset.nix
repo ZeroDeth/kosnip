@@ -10,9 +10,15 @@
 #   - Secrets: /run/secrets/openclaw-env
 #
 # DOPPLER CONFIGURATION:
-#   - DOPPLER_ENVIRONMENT (env)
-#   - DOPPLER_PROJECT (env)
-#   - DOPPLER_CONFIG (env)
+#   - DOPPLER_WORKSPACE = "claw"
+#   - DOPPLER_PROJECT = "{name}-claw"
+#   - DOPPLER_ENVIRONMENT = "dev_{name}"
+#   - DOPPLER_CONFIG = "dev_{name}"
+#
+# USER/HOST NAMING:
+#   - User: {name} (e.g., black, green, pink)
+#   - Host: {name}
+#   - SSH/GPG keys: {name}-claw
 #
 # FIRST-PARTY PLUGINS (enabled by default):
 #   - sag (TTS)
@@ -22,9 +28,11 @@
 #   {
 #     imports = [ ./bot-preset.nix ];
 #     bot = {
+#       enable = true;
 #       name = "black";
-#       owner = "zerodeth";
-#       project = "black";
+#       owner = "clawzero";
+#       project = "black-claw";
+#       environment = "dev_black";
 #       enablePlugins = [ "sag" ];
 #     };
 #   }
@@ -33,6 +41,7 @@
 
 let
   botCfg = config.bot;
+  userName = botCfg.name;  # User matches hostname
 in
 {
   options.bot = {
@@ -40,24 +49,23 @@ in
 
     name = lib.mkOption {
       type = lib.types.str;
-      description = "Bot hostname (e.g., black, green, pink)";
+      description = "Bot/machine hostname (e.g., black, green, pink)";
     };
 
     owner = lib.mkOption {
       type = lib.types.str;
-      description = "Bot owner username";
-      default = "zerodeth";
+      description = "GitHub owner (clawzero)";
+      default = "clawzero";
     };
 
     project = lib.mkOption {
       type = lib.types.str;
-      description = "Doppler project name";
+      description = "Doppler project name ({name}-claw)";
     };
 
     environment = lib.mkOption {
       type = lib.types.str;
-      description = "Doppler environment";
-      default = "dev";
+      description = "Doppler environment (dev_{name})";
     };
 
     enablePlugins = lib.mkOption {
@@ -68,16 +76,24 @@ in
   };
 
   config = lib.mkIf botCfg.enable {
+    # === HOSTNAME ===
+    networking.hostName = botCfg.name;
+
+    # === USER (matches hostname) ===
+    users.users.${userName} = {
+      isNormalUser = true;
+      description = botCfg.owner;
+      extraGroups = [ "networkmanager" "wheel" "tailscale" ];
+      openssh.authorizedKeys.keys = [
+        # SSH key pulled from GitHub during setup
+        # https://github.com/clawzero/dotfiles/raw/main/keys/${botCfg.name}-claw/id_ed25519.pub
+      ];
+    };
+
     # === BOOT ===
     boot.loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
-    };
-
-    # === NETWORKING ===
-    networking = {
-      firewall.enable = false;
-      hostName = botCfg.name;
     };
 
     i18n.defaultLocale = "en_GB.UTF-8";
@@ -126,8 +142,9 @@ in
         Restart = "always";
         RestartSec = "10s";
         Environment = [
-          "DOPPLER_ENVIRONMENT=${botCfg.environment}"
+          "DOPPLER_WORKSPACE=claw"
           "DOPPLER_PROJECT=${botCfg.project}"
+          "DOPPLER_ENVIRONMENT=${botCfg.environment}"
           "DOPPLER_CONFIG=${botCfg.environment}"
         ];
         EnvironmentFile = "/run/secrets/openclaw-env";
@@ -136,18 +153,11 @@ in
 
     # === DIRECTORIES ===
     systemd.tmpfiles.rules = [
-      "d /var/lib/openclaw 0755 root root -"
-      "d /var/lib/openclaw/workspace 0755 root root -"
-      "d /tmp/openclaw 0755 root root -"
+      "d /var/lib/openclaw 0755 ${userName} ${userName} -"
+      "d /var/lib/openclaw/workspace 0755 ${userName} ${userName} -"
+      "d /tmp/openclaw 0755 ${userName} ${userName} -"
       "d /run/secrets 0755 root root -"
     ];
-
-    # === USER ===
-    users.users.${botCfg.owner} = {
-      isNormalUser = true;
-      description = botCfg.owner;
-      extraGroups = [ "networkmanager" "wheel" "tailscale" ];
-    };
 
     # === PACKAGES ===
     environment.systemPackages = with pkgs; [

@@ -4,67 +4,73 @@
 
 ---
 
-## Doppler
+## Naming Convention
 
-| Secret | Required | Example |
-|--------|----------|---------|
-| `DOPPLER_TOKEN` | Yes | Service token for Doppler CLI |
-| `TELEGRAM_BOT_TOKEN` | Yes (if Telegram channel) | Telegram bot token |
-| `ANTHROPIC_API_KEY` | Yes | Claude API key |
-| `OPENAI_API_KEY` | Optional | GPT-4 API key |
-
-**Doppler project must exist:**
-- Named matching the bot (e.g., `black`, `green`, `pink`)
-- Environment: `dev` (default)
-- Service token with `secrets.read` scope
+| Component | Pattern | Example |
+|-----------|---------|---------|
+| Machine name | `{name}` | `black` |
+| Hostname | `{name}` | `black` |
+| User | `{name}` | `black` |
+| SSH/GPG keys | `{name}-claw` | `black-claw` |
+| Doppler workspace | `claw` | `claw` |
+| Doppler project | `{name}-claw` | `black-claw` |
+| Doppler env | `dev_{name}` | `dev_black` |
 
 ---
 
 ## GitHub
 
-| Item | Required | Notes |
+| Item | Required | Value |
 |------|----------|-------|
-| Repository | Yes | Where bot config lives |
-| Branch protection | No | Optional for production bots |
-| GitHub Actions secrets | Optional | For CI/CD deployment |
+| GitHub user | Yes | `clawzero` |
+| SSH keys | Yes | `id_ed25519-{name}-claw` in dotfiles repo |
+| GPG keys | Yes | `{name}-claw.asc` in dotfiles repo |
+| Repository | Yes | `clawzero/kosnip` |
+
+**Keys location:**
+```
+https://github.com/clawzero/dotfiles/raw/main/keys/{name}-claw/
+├── id_ed25519.pub      # SSH public key
+├── id_ed25519          # SSH private key
+├── {name}-claw.asc     # GPG public key
+└── {name}-claw.secret  # GPG private key
+```
+
+---
+
+## Doppler
+
+| Variable | Value | Example |
+|----------|-------|---------|
+| `DOPPLER_WORKSPACE` | `claw` | `claw` |
+| `DOPPLER_PROJECT` | `{name}-claw` | `black-claw` |
+| `DOPPLER_ENVIRONMENT` | `dev_{name}` | `dev_black` |
+| `DOPPLER_CONFIG` | `dev_{name}` | `dev_black` |
+
+**Required secrets in Doppler:**
+- `TELEGRAM_BOT_TOKEN` (if Telegram channel)
+- `ANTHROPIC_API_KEY`
+- `OPENAI_API_KEY` (optional)
+
+**Setup:**
+```bash
+# Create Doppler project
+doppler projects create "black-claw" --workspace claw
+
+# Set secrets
+doppler secrets set TELEGRAM_BOT_TOKEN="..." --project black-claw --config dev_black
+doppler secrets set ANTHROPIC_API_KEY="..." --project black-claw --config dev_black
+```
 
 ---
 
 ## Tailscale
 
-| Item | Required | Notes |
+| Item | Required | Value |
 |------|----------|-------|
-| Tailscale account | Yes | Access to tailnet |
-| Auth key or OAuth | Yes | For auto-joining machines |
-| Machine hostname | Yes | e.g., `black.ts.net` |
-
----
-
-## Repository Structure
-
-```
-bots/
-├── hosts/
-│   └── nix-{bot-name}/
-│       ├── default.nix    # Bot configuration
-│       ├── install-nix.sh # Installation script
-│       └── README.md      # Bot documentation
-└── common/
-    └── bot/
-        ├── bot-preset.nix # Standardized configuration
-        └── README.md      # Preset documentation
-```
-
----
-
-## Naming Convention
-
-| Pattern | Example |
-|---------|---------|
-| Bot name | `black`, `green`, `pink` |
-| NixOS hostname | `black`, `green`, `pink` |
-| Doppler project | `black`, `green`, `pink` |
-| Tailscale hostname | `black.ts.net` |
+| Auth key | Yes | From Tailscale admin console |
+| Hostname | Yes | `{name}` | `black` |
+| Tailnet | Yes | Your tailnet |
 
 ---
 
@@ -72,31 +78,51 @@ bots/
 
 Before creating a new bot, verify:
 
-- [ ] Doppler project exists
-- [ ] Doppler service token created
+- [ ] GitHub user: `clawzero`
+- [ ] SSH key: `id_ed25519-{name}-claw` in dotfiles repo
+- [ ] GPG key: `{name}-claw.asc` in dotfiles repo
+- [ ] Doppler project: `{name}-cl claw`
+- [ ] Doppler environment: `dev_{name}`
+- [ ] Doppler secrets set
 - [ ] Tailscale auth key ready
-- [ ] Telegram bot token in Doppler (if needed)
-- [ ] API keys in Doppler (Claude, OpenAI, etc.)
-- [ ] Repository branch exists
-- [ ] Unique bot name (not used before)
+- [ ] Hostname: `{name}`
 
 ---
 
-## Example: Adding a New Bot
+## Example: Adding Pink Bot
 
 ```bash
-# 1. Verify prerequisites
-cat PREREQUISITES.md
+# 1. Add keys to dotfiles repo
+#    https://github.com/clawzero/dotfiles/tree/main/keys/pink-claw/
 
 # 2. Create Doppler project
-doppler projects create "pink" --config dev
+doppler projects create "pink-claw" --workspace claw
 
 # 3. Add secrets
-doppler secrets set TELEGRAM_BOT_TOKEN="..." --project pink --config dev
+doppler secrets set TELEGRAM_BOT_TOKEN="..." --project pink-claw --config dev_pink
+doppler secrets set ANTHROPIC_API_KEY="..." --project pink-claw --config dev_pink
 
-# 4. Create Tailscale auth key
-#    (via Tailscale admin console)
+# 4. Create Tailscale auth key for "pink"
 
-# 5. Create bot config using bot-preset.nix
-#    (see hosts/common/bot/bot-preset.nix)
+# 5. Create bot config:
+#    hosts/nixos/nix-pink/default.nix
+```
+
+---
+
+## Repository Structure
+
+```
+kosnip/
+├── PREREQUISITES.md          # This file
+├── hosts/
+│   ├── common/
+│   │   └── bot/
+│   │       ├── bot-preset.nix    # Standardized config
+│   │       └── README.md         # Preset docs
+│   └── nixos/
+│       └── nix-{name}/
+│           ├── default.nix       # Bot config (uses preset)
+│           ├── install-nix.sh    # Installation script
+│           └── README.md         # Bot docs
 ```
