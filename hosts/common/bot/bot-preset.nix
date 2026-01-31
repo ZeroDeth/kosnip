@@ -183,8 +183,9 @@ in
           
           # Guardrails: Only send to authorized recipients
           allowedRecipients = [
-            "sherif@abdalla.co.uk"  # Only Sherif can receive emails
+            "sherif@abdalla.co.uk"  # Sherif
             "sherif+clawzero@abdalla.co.uk"
+            "pink@abdalla.co.uk"    # Yesim (pink bot owner)
           ];
           
           # Require consent for new recipients

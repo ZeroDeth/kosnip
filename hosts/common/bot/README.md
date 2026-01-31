@@ -90,7 +90,8 @@ Set via `bot.imageBackend`.
 ### Email Guardrails
 
 **Restricted recipients:**
-- Only `sherif@abdalla.co.uk` (and variants)
+- `sherif@abdalla.co.uk` (Sherif)
+- `pink@abdalla.co.uk` (Yesim)
 - No emails to unknown recipients
 
 **Consent required:**
@@ -106,7 +107,10 @@ programs.openclaw.config = {
     smtp.password = "$GMAIL_APP_PASSWORD";
     
     # Guardrails
-    allowedRecipients = [ "sherif@abdalla.co.uk" ];
+    allowedRecipients = [
+      "sherif@abdalla.co.uk"
+      "pink@abdalla.co.uk"
+    ];
     requireConsent = true;
     logAll = true;
   };
