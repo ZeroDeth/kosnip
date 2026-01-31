@@ -84,6 +84,12 @@ in
       description = "Image analysis backend";
       default = "openai";
     };
+
+    emailAddress = lib.mkOption {
+      type = lib.types.str;
+      description = "Email address (Gmail with alias)";
+      default = "clawzero.agent+${botCfg.name}@gmail.com";
+    };
   };
 
   config = lib.mkIf botCfg.enable {
@@ -163,6 +169,17 @@ in
         webSearch = {
           provider = "brave";
           apiKey = "$BRAVE_API_KEY";
+        };
+        
+        # Email: Gmail with aliases
+        email = {
+          address = botCfg.emailAddress;
+          smtp = {
+            host = "smtp.gmail.com";
+            port = 587;
+            user = "clawzero.agent@gmail.com";
+            password = "$GMAIL_APP_PASSWORD";
+          };
         };
       };
     };
