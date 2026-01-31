@@ -78,6 +78,41 @@ Set via `bot.imageBackend`.
 |----------|---------|
 | Brave | `$BRAVE_API_KEY` |
 
+## Email (Gmail with aliases)
+
+| Setting | Value |
+|---------|-------|
+| Main | clawzero.agent@gmail.com |
+| Alias format | clawzero.agent+{name}@gmail.com |
+| SMTP | smtp.gmail.com:587 |
+| App Password | `$GMAIL_APP_PASSWORD` (Doppler) |
+
+### Email Guardrails
+
+**Restricted recipients:**
+- Only `sherif@abdalla.co.uk` (and variants)
+- No emails to unknown recipients
+
+**Consent required:**
+- New recipients require explicit consent from Sherif
+- All emails logged
+
+```nix
+programs.openclaw.config = {
+  email = {
+    address = "clawzero.agent+${botCfg.name}@gmail.com";
+    smtp.host = "smtp.gmail.com";
+    smtp.user = "clawzero.agent@gmail.com";
+    smtp.password = "$GMAIL_APP_PASSWORD";
+    
+    # Guardrails
+    allowedRecipients = [ "sherif@abdalla.co.uk" ];
+    requireConsent = true;
+    logAll = true;
+  };
+};
+```
+
 ## First-Party Plugins
 
 | Plugin | Default |

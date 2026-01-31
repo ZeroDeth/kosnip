@@ -180,6 +180,18 @@ in
             user = "clawzero.agent@gmail.com";
             password = "$GMAIL_APP_PASSWORD";
           };
+          
+          # Guardrails: Only send to authorized recipients
+          allowedRecipients = [
+            "sherif@abdalla.co.uk"  # Only Sherif can receive emails
+            "sherif+clawzero@abdalla.co.uk"
+          ];
+          
+          # Require consent for new recipients
+          requireConsent = true;
+          
+          # Log all emails
+          logAll = true;
         };
       };
     };
