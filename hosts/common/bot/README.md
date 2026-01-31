@@ -78,16 +78,40 @@ Set via `bot.imageBackend`.
 |----------|---------|
 | Brave | `$BRAVE_API_KEY` |
 
-## Email (Gmail with aliases)
+## Email (configurable per bot)
 
-| Setting | Value |
-|---------|-------|
-| Main | clawzero.agent@gmail.com |
-| Alias format | clawzero.agent+{name}@gmail.com |
-| SMTP | smtp.gmail.com:587 |
-| App Password | `$GMAIL_APP_PASSWORD` (Doppler) |
+Each bot can have different email setup:
 
-### Email Guardrails
+| Bot | Email | SMTP |
+|-----|-------|------|
+| Yellow | `clawzero.agent+yellow@gmail.com` | smtp.gmail.com |
+| Pink | `yesim+pink@abdalla.co.uk` | Custom |
+
+### Configuration
+
+```nix
+bot = {
+  enable = true;
+  name = "yellow";
+  emailAddress = "clawzero.agent+yellow@gmail.com";
+  emailSmtpHost = "smtp.gmail.com";
+  emailSmtpUser = "clawzero.agent@gmail.com";
+  emailPasswordSecret = "GMAIL_APP_PASSWORD";
+};
+```
+
+```nix
+bot = {
+  enable = true;
+  name = "pink";
+  emailAddress = "yesim+pink@abdalla.co.uk";
+  emailSmtpHost = "smtp.custom.provider.com";
+  emailSmtpUser = "yesim+pink@abdalla.co.uk";
+  emailPasswordSecret = "PINK_EMAIL_PASSWORD";
+};
+```
+
+### Guardrails
 
 **Restricted recipients:**
 - `sherif@abdalla.co.uk` (Sherif)

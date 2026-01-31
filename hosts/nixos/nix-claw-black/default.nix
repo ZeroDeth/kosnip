@@ -18,5 +18,11 @@
     environment = "dev_black";
     enablePlugins = [ "sag" ];
     imageBackend = "openai";  # openai, gemini, or brave
+    
+    # Email: Gmail alias for black
+    emailAddress = "clawzero.agent+black@gmail.com";
+    emailSmtpHost = "smtp.gmail.com";
+    emailSmtpUser = "clawzero.agent@gmail.com";
+    emailPasswordSecret = "GMAIL_APP_PASSWORD";
   };
 }

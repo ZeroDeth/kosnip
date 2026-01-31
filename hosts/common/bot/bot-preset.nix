@@ -87,8 +87,26 @@ in
 
     emailAddress = lib.mkOption {
       type = lib.types.str;
-      description = "Email address (Gmail with alias)";
+      description = "Email address (e.g., clawzero.agent+yellow@gmail.com or yesim+pink@abdalla.co.uk)";
       default = "clawzero.agent+${botCfg.name}@gmail.com";
+    };
+
+    emailSmtpHost = lib.mkOption {
+      type = lib.types.str;
+      description = "SMTP host (e.g., smtp.gmail.com or custom)";
+      default = "smtp.gmail.com";
+    };
+
+    emailSmtpUser = lib.mkOption {
+      type = lib.types.str;
+      description = "SMTP username";
+      default = "clawzero.agent@gmail.com";
+    };
+
+    emailPasswordSecret = lib.mkOption {
+      type = lib.types.str;
+      description = "Doppler secret name for email password";
+      default = "GMAIL_APP_PASSWORD";
     };
   };
 
@@ -171,21 +189,21 @@ in
           apiKey = "$BRAVE_API_KEY";
         };
         
-        # Email: Gmail with aliases
+        # Email: Configurable per bot
         email = {
           address = botCfg.emailAddress;
           smtp = {
-            host = "smtp.gmail.com";
+            host = botCfg.emailSmtpHost;
             port = 587;
-            user = "clawzero.agent@gmail.com";
-            password = "$GMAIL_APP_PASSWORD";
+            user = botCfg.emailSmtpUser;
+            password = "$${botCfg.emailPasswordSecret}";
           };
           
           # Guardrails: Only send to authorized recipients
           allowedRecipients = [
-            "sherif@abdalla.co.uk"  # Sherif
+            "sherif@abdalla.co.uk"
             "sherif+clawzero@abdalla.co.uk"
-            "pink@abdalla.co.uk"    # Yesim (pink bot owner)
+            "pink@abdalla.co.uk"
           ];
           
           # Require consent for new recipients
