@@ -35,6 +35,11 @@
           hostname = "nix-komodo-02";
           username = "zerodeth";
         };
+        nix-black-personal = libx.mkNixos {
+          system = "x86_64-linux";
+          hostname = "nix-black-personal";
+          username = "zerodeth";
+        };
       };
     };
 }
