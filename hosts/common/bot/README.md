@@ -19,6 +19,7 @@ Standardized configuration for all bots. **No exceptions.**
     project = "black-claw";
     environment = "dev_black";
     enablePlugins = [ "sag" ];
+    imageBackend = "openai";  # openai, gemini, or brave
   };
 }
 ```
@@ -53,6 +54,29 @@ Standardized configuration for all bots. **No exceptions.**
 | `DOPPLER_PROJECT` | `{name}-claw` | `black-claw` |
 | `DOPPLER_ENVIRONMENT` | `dev_{name}` | `dev_black` |
 | `DOPPLER_CONFIG` | `dev_{name}` | `dev_black` |
+
+## AI Providers (standardized)
+
+| Role | Provider | Model |
+|------|----------|-------|
+| **Default** | MiniMax | `MiniMax-M2.1` |
+| **Failback** | Anthropic | `claude-opus-4-5` |
+
+## Image Analysis (configurable)
+
+| Option | Provider | Model |
+|--------|----------|-------|
+| `openai` | OpenAI | `gpt-4o` |
+| `gemini` | Google | `gemini-1.5-pro` |
+| `brave` | Brave | `brave-search` |
+
+Set via `bot.imageBackend`.
+
+## Web Search
+
+| Provider | API Key |
+|----------|---------|
+| Brave | `$BRAVE_API_KEY` |
 
 ## First-Party Plugins
 

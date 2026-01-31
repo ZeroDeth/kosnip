@@ -23,6 +23,11 @@
 # FIRST-PARTY PLUGINS (enabled by default):
 #   - sag (TTS)
 #
+# AI PROVIDERS:
+#   - Default: minimax/MiniMax-M2.1
+#   - Failback: anthropic/claude-opus-4-5
+#   - Image: openai, gemini, or brave
+#
 # USAGE:
 #   { config, pkgs, ... }:
 #   {
@@ -73,6 +78,12 @@ in
       description = "First-party plugins to enable";
       default = [ "sag" ];
     };
+
+    imageBackend = lib.mkOption {
+      type = lib.types.enum [ "openai" "gemini" "brave" ];
+      description = "Image analysis backend";
+      default = "openai";
+    };
   };
 
   config = lib.mkIf botCfg.enable {
@@ -121,6 +132,38 @@ in
       
       firstParty = {
         sag.enable = lib.elem "sag" botCfg.enablePlugins;
+      };
+      
+      # AI Configuration (standardized)
+      config = {
+        # Default model: MiniMax
+        defaultModel = "minimax/MiniMax-M2.1";
+        
+        # Failback: Anthropic
+        providers = {
+          anthropic = {
+            apiKey = "$ANTHROPIC_API_KEY";
+            models = [ "claude-opus-4-5" ];
+          };
+          minimax = {
+            apiKey = "$MINIMAX_API_KEY";
+            models = [ "MiniMax-M2.1" ];
+          };
+        };
+        
+        # Image backend: openai, gemini, or brave
+        imageModel = {
+          provider = botCfg.imageBackend;
+          model = if botCfg.imageBackend == "openai" then "gpt-4o"
+            else if botCfg.imageBackend == "gemini" then "gemini-1.5-pro"
+            else "brave-search";
+        };
+        
+        # Search: Brave
+        webSearch = {
+          provider = "brave";
+          apiKey = "$BRAVE_API_KEY";
+        };
       };
     };
 

@@ -17,5 +17,6 @@
     project = "black-claw";
     environment = "dev_black";
     enablePlugins = [ "sag" ];
+    imageBackend = "openai";  # openai, gemini, or brave
   };
 }
