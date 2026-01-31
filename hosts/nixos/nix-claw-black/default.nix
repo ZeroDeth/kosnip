@@ -2,12 +2,12 @@
 # Following nix-openclaw official patterns
 #
 # Standard paths (same across all bots):
-#   - State: ~/.openclaw
-#   - Workspace: ~/.openclaw/workspace
-#   - Config: ~/.openclaw/openclaw.json
+#   - State: /var/lib/openclaw
+#   - Workspace: /var/lib/openclaw/workspace
+#   - Config: /var/lib/openclaw/openclaw.json
 #   - Logs: /tmp/openclaw/openclaw-gateway.log
 #
-# Secrets: Doppler (environment variables at runtime)
+# Secrets: Doppler (runtime environment variables)
 
 { pkgs, unstablePkgs, inputs, ... }:
 
@@ -50,7 +50,6 @@
   };
 
   # OpenClaw via nix-openclaw (not Docker)
-  # Uses nix-openclaw home-manager module
   programs.openclaw = {
     enable = true;
     systemd.enable = true;
@@ -64,11 +63,48 @@
       sag.enable = true;  # TTS
     };
     
-    # Bot configuration
+    # Bot configuration (per-environment via Doppler)
     config = {
-      # Channel will be configured per-environment via Doppler
+      # Config loaded from Doppler at runtime
     };
   };
+
+  # Doppler integration
+  # Doppler provides secrets via environment variables
+  programs.doppler = {
+    enable = true;
+    json = true;
+  };
+
+  # Systemd service for OpenClaw with Doppler environment
+  # Doppler secrets injected at runtime
+  systemd.services.openclaw-black = {
+    description = "OpenClaw Black - Sherif's personal AI";
+    after = [ "network.target" "doppler.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "notify";
+      ExecStart = "${pkgs.openclaw}/bin/openclaw gateway";
+      WorkingDirectory = "/var/lib/openclaw";
+      Restart = "always";
+      RestartSec = "10s";
+      # Doppler environment variables
+      Environment = [
+        "DOPPLER_ENVIRONMENT=dev"
+        "DOPPLER_PROJECT=black"
+        "DOPPLER_CONFIG=dev"
+      ];
+      # EnvironmentFile from Doppler secrets
+      EnvironmentFile = "/run/secrets/openclaw-env";
+    };
+  };
+
+  # Generate Doppler secrets file
+  # This is a template - actual values come from Doppler at runtime
+  systemd.tmpfiles.rules = [
+    "d /run/secrets 0755 root root -"
+    "f /run/secrets/openclaw-env 0600 root root -"
+  ];
 
   # User configuration
   users.users.zerodeth = {
@@ -82,11 +118,13 @@
     "d /var/lib/openclaw 0755 root root -"
     "d /var/lib/openclaw/workspace 0755 root root -"
     "d /tmp/openclaw 0755 root root -"
+    "d /run/secrets 0755 root root -"
   ];
 
   # Packages
   environment.systemPackages = with pkgs; [
     tailscale
     git
+    doppler
   ];
 }
