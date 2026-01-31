@@ -161,7 +161,7 @@ https://github.com/clawzero/dotfiles/raw/main/keys/{name}-claw/*
 ## Included by Preset
 
 - Tailscale mesh networking
-- OpenClaw via nix-openclaw
+- OpenClaw via nix-clawdbot (fork)
 - Systemd service
 - Doppler integration
 - User `{name}` (not zerodeth)

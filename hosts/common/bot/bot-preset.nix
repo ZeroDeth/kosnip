@@ -2,6 +2,8 @@
 #
 # All bots inherit from this preset. No exceptions.
 #
+# FRAMEWORK: OpenClaw via nix-clawdbot (clawzero fork)
+#
 # STANDARD PATHS (same for all bots):
 #   - State: /var/lib/openclaw
 #   - Workspace: /var/lib/openclaw/workspace

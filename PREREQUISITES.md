@@ -23,17 +23,16 @@
 | Item | Required | Value |
 |------|----------|-------|
 | GitHub user | Yes | `clawzero` |
-| SSH keys | Yes | `id_ed25519-{name}-claw` in dotfiles repo |
-| GPG keys | Yes | `{name}-claw.asc` in dotfiles repo |
-| Repository | Yes | `clawzero/kosnip` |
+| SSH public keys | Yes | `id_ed25519-{name}-claw.pub` in claw-dot repo |
+| SSH private keys | Yes | In Doppler (secret storage) |
+| GPG public keys | Yes | `{name}-claw.asc` in claw-dot repo |
+| GPG private keys | Yes | In Doppler (secret storage) |
+| Repository | Yes | `clawzero/claw-nix` |
 
-**Keys location:**
+**Keys storage:**
 ```
-https://github.com/clawzero/dotfiles/raw/main/keys/{name}-claw/
-├── id_ed25519.pub      # SSH public key
-├── id_ed25519          # SSH private key
-├── {name}-claw.asc     # GPG public key
-└── {name}-claw.secret  # GPG private key
+Public keys  ──► claw-dot repo (anyone can read)
+Private keys ──► Doppler (secret storage)
 ```
 
 ---
@@ -113,7 +112,7 @@ doppler secrets set ANTHROPIC_API_KEY="..." --project pink-claw --config dev_pin
 ## Repository Structure
 
 ```
-kosnip/
+claw-nix/
 ├── PREREQUISITES.md          # This file
 ├── hosts/
 │   ├── common/
