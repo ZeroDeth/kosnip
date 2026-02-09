@@ -136,15 +136,3 @@ npm-config HOST *V:
 # Deploy Dockge configuration and compose files to remote host(s)
 dockge-deploy HOST *V:
   cd ansible && ansible-playbook playbook.yaml --limit {{HOST}} --tags dockge_config,dockge_compose {{V}}
-
-# Install NixOS on nix-claw-black host (Sherif's personal AI)
-install-black IP:
-  ssh -o "StrictHostKeyChecking no" nixos@{{IP}} "sudo bash -c '\
-    nix-shell -p git --run \"cd /root/ && \
-    git clone https://github.com/ZeroDeth/kosnip.git && \
-    cd kosnip/hosts/nixos/nix-claw-black/ && \
-    sh install-nix.sh nix-claw-black\"'"
-
-# Deploy to nix-claw-black from local machine
-deploy-black target_host="nix-claw-black":
-  ssh root@{{target_host}} "cd /root && rm -rf kosnip && git clone https://github.com/ZeroDeth/kosnip.git && cd kosnip && nixos-rebuild switch --flake .#{{target_host}}"
