@@ -11,6 +11,7 @@ in
     git
     htop
     iperf3
+    go-task
     just
     python3
     tree

@@ -1,0 +1,301 @@
+version: '3'
+
+# Global variables
+vars:
+  ANSIBLE_DIR: ./ansible
+  HOSTS_DIR: ./hosts/nixos
+  # Automatically discover all NixOS hosts from the hosts directory
+  NIXOS_HOSTS:
+    sh: find {{.HOSTS_DIR}} -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | tr '\n' ' '
+
+# Include files for better organization
+includes:
+  install:
+    taskfile: ./tasks/install.yml
+    optional: true
+  deploy:
+    taskfile: ./tasks/deploy.yml
+    optional: true
+
+tasks:
+  # Repository management
+  sub-update:
+    desc: Update git submodules
+    cmds:
+      - git submodule update --init --recursive
+
+  # List all available hosts
+  list-hosts:
+    desc: List all available NixOS hosts
+    cmds:
+      - echo "Available hosts:"
+      - for host in {{.NIXOS_HOSTS}}; do echo "  - $host"; done
+
+  # NixOS Installation Tasks (Dynamic)
+  install:
+    desc: Install NixOS on a remote host
+    summary: |
+      Install NixOS on a remote host via SSH
+      Usage: task install HOST=<hostname> IP=<ip_address>
+      Example: task install HOST=nix-llm IP=192.168.1.100
+      
+      During initial installation, you need both HOST and IP since the host
+      doesn't exist in your inventory yet. After installation, you can use
+      the hostname-specific shortcuts like 'task deploy:nix-llm'.
+    vars:
+      HOST: '{{.HOST}}'
+      IP: '{{.IP | default ""}}'
+    preconditions:
+      - sh: '[ -n "{{.IP}}" ]'
+        msg: 'IP variable is required. Usage: task install HOST=<hostname> IP=<ip_address>'
+      - sh: '[ -n "{{.HOST}}" ]'
+        msg: 'HOST is required'
+      - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
+        msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
+    cmds:
+      - echo "🚀 Installing NixOS on {{.HOST}} ({{.IP}})..."
+      - |
+        ssh -o "StrictHostKeyChecking no" nixos@{{.IP}} "sudo bash -c '
+          echo \"📦 Setting up Nix environment...\"
+          
+          # Check if running as root
+          if [ \"\$EUID\" -ne 0 ]; then
+            echo \"❌ This script must be run as root\"
+            exit 1
+          fi
+          
+          # Clone repository if not exists
+          if [ ! -d \"/root/kosnip\" ]; then
+            echo \"📥 Cloning repository...\"
+            nix-shell -p git --run \"cd /root/ && git clone https://github.com/ZeroDeth/kosnip.git\"
+          else
+            echo \"🔄 Updating existing repository...\"
+            cd /root/kosnip && git pull
+          fi
+          
+          cd /root/kosnip/hosts/nixos/{{.HOST}}/
+          
+          echo \"💾 Partitioning disk with disko...\"
+          nix --experimental-features \"nix-command flakes\" run github:nix-community/disko -- --mode disko ../../common/disko.nix
+          
+          echo \"⚙️  Generating hardware configuration...\"
+          nixos-generate-config --no-filesystems --root /mnt
+          
+          echo \"📋 Copying hardware configuration...\"
+          cp ../../common/hardware-configuration.nix /mnt/etc/nixos/
+          
+          echo \"🔧 Installing NixOS for {{.HOST}}...\"
+          export NIXPKGS_ALLOW_UNFREE=1
+          nixos-install --root /mnt --flake .#{{.HOST}} --impure
+          
+          echo \"✅ NixOS installation completed for {{.HOST}}!\"
+        '"
+      - echo "✅ Installation completed! Host {{.HOST}} should now be ready to boot."
+      - echo "💡 Next steps:"
+      - echo "   1. Reboot the host and ensure it comes up with the new NixOS installation"
+      - echo "   2. Add the host to your SSH config or ansible/hosts.ini if not already present"
+      - echo "   3. Deploy services with \"task deploy:HOST_NAME\""
+      - echo ""
+
+  # NixOS Update Tasks (Dynamic)
+  update:
+    desc: Update NixOS configuration on a remote host
+    summary: |
+      Update NixOS configuration on a remote host
+      Usage: task update HOST=<hostname>
+      Example: task update HOST=nix-llm
+    vars:
+      HOST: '{{.HOST}}'
+    preconditions:
+      - sh: '[ -n "{{.HOST}}" ]'
+        msg: 'HOST is required'
+      - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
+        msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
+    cmds:
+      - ssh root@{{.HOST}} "cd /root/kosnip && git pull && nixos-rebuild switch --flake .#{{.HOST}}"
+
+  # Docker Compose Deployment (Dynamic)
+  compose:
+    desc: Deploy Docker Compose services to a host
+    summary: |
+      Deploy Docker Compose services to a host (includes Dockge automatically)
+      Usage: task compose HOST=<hostname> [VERBOSE=true]
+      Example: task compose HOST=nix-npm VERBOSE=true
+    vars:
+      HOST: '{{.HOST}}'
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+      ANSIBLE_VERBOSE: '{{if eq .VERBOSE "true"}}-vvvv{{else}}{{end}}'
+    preconditions:
+      - sh: '[ -n "{{.HOST}}" ]'
+        msg: 'HOST is required'
+      - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
+        msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
+    cmds:
+      - cd {{.ANSIBLE_DIR}} && ansible-playbook playbook.yaml --limit {{.HOST}} --tags compose {{.ANSIBLE_VERBOSE}}
+
+  # Host-specific configuration deployment
+  config:
+    desc: Deploy configuration files to a host
+    summary: |
+      Deploy only configuration files to a host
+      Usage: task config HOST=<hostname> [VERBOSE=true]
+      Example: task config HOST=nix-npm VERBOSE=true
+    vars:
+      HOST: '{{.HOST}}'
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+      ANSIBLE_VERBOSE: '{{if eq .VERBOSE "true"}}-vvvv{{else}}{{end}}'
+      CONFIG_TAG: '{{.HOST | replace "nix-" "" | replace "-" "_"}}_config'
+    preconditions:
+      - sh: '[ -n "{{.HOST}}" ]'
+        msg: 'HOST is required'
+      - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
+        msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
+    cmds:
+      - cd {{.ANSIBLE_DIR}} && ansible-playbook playbook.yaml --limit {{.HOST}} --tags {{.CONFIG_TAG}} {{.ANSIBLE_VERBOSE}}
+
+  # Dockge-specific deployment
+  dockge:
+    desc: Deploy Dockge to a host
+    summary: |
+      Deploy only Dockge container management to a host
+      Usage: task dockge HOST=<hostname> [VERBOSE=true]
+      Example: task dockge HOST=nix-npm VERBOSE=true
+    vars:
+      HOST: '{{.HOST}}'
+      VERBOSE: '{{.VERBOSE | default "false"}}'
+      ANSIBLE_VERBOSE: '{{if eq .VERBOSE "true"}}-vvvv{{else}}{{end}}'
+    preconditions:
+      - sh: '[ -n "{{.HOST}}" ]'
+        msg: 'HOST is required'
+      - sh: '[ -d "{{.HOSTS_DIR}}/{{.HOST}}" ]'
+        msg: 'Host directory {{.HOSTS_DIR}}/{{.HOST}} does not exist'
+    cmds:
+      - cd {{.ANSIBLE_DIR}} && ansible-playbook playbook.yaml --limit {{.HOST}} --tags dockge_config,dockge_compose {{.ANSIBLE_VERBOSE}}
+
+  # Show system settings and status
+  show-settings:
+    desc: Show system settings and status for a host
+    summary: |
+      Show system settings and status for a host
+      Usage: task show-settings HOST=<hostname>
+      Example: task show-settings HOST=nix-llm
+    vars:
+      HOST: '{{.HOST | default "nix-llm"}}'
+    cmds:
+      - |
+        ssh root@{{.HOST}} "
+          nixos-rebuild dry-activate --flake /root/kosnip#{{.HOST}} && 
+          echo '\nCurrent hostname:' && hostname && 
+          echo '\nNetwork configuration:' && ip addr show && 
+          echo '\nEnabled services:' && systemctl list-units --type=service --state=active | grep -v '.slice'
+        "
+
+  # Batch operations for all hosts
+  install-all:
+    desc: Install NixOS on all hosts (requires IP mapping)
+    summary: |
+      Install NixOS on all hosts. You need to define IP addresses.
+      Edit this task to add your IP mappings.
+    cmds:
+      - echo "Please define IP mappings for your hosts in the Taskfile.yml"
+      - echo "Available hosts in hosts/nixos directory"
+
+  update-all:
+    desc: Update all NixOS hosts
+    cmds:
+      - for: { var: NIXOS_HOSTS, split: ' ' }
+        cmd: task update HOST={{.ITEM}}
+
+  # Utility tasks
+  fmt:
+    desc: Format Nix files
+    cmds:
+      - nixpkgs-fmt .
+
+  check:
+    desc: Check Nix flake configuration
+    cmds:
+      - nix flake check
+
+  validate:
+    desc: Format and validate Nix files
+    summary: |
+      Format Nix files and validate flake configuration
+      Usage: task validate
+    cmds:
+      - task: fmt
+      - task: check
+
+  lint:
+    desc: Format Nix files (alias for fmt)
+    cmds:
+      - task: fmt
+
+  clean:
+    desc: Clean up temporary files
+    cmds:
+      - find . -name "*.tmp" -delete
+      - find . -name ".DS_Store" -delete
+
+  clean-install-scripts:
+    desc: Remove old install scripts (now integrated into Taskfile)
+    summary: |
+      Remove the individual install-nix.sh scripts from each host directory
+      since the installation logic is now integrated into the Taskfile
+      Usage: task clean-install-scripts
+    prompt: This will delete all install-nix.sh scripts. Continue?
+    cmds:
+      - find hosts/nixos -name "install-nix.sh" -delete
+      - echo "✅ Removed old install scripts. Installation now handled by 'task install HOST=<host> IP=<ip>'"
+
+  # Development helpers
+  dev:
+    desc: Development shortcuts
+    cmds:
+      - echo "Development commands:"
+      - echo "  task list-hosts     - List all available hosts"
+      - echo "  task compose HOST=hostname - Deploy services to host"
+      - echo "  task update HOST=hostname  - Update NixOS config"
+      - echo "  task install HOST=hostname IP=ip_address - Install NixOS"
+      - echo ""
+      - echo "Code quality:"
+      - echo "  task fmt            - Format Nix files"
+      - echo "  task check          - Check Nix flake"
+      - echo "  task validate       - Format and validate"
+      - echo "  task clean          - Clean temporary files"
+      - echo ""
+      - echo "Documentation:"
+      - echo "  task docs           - Open main documentation"
+      - echo "  task docs-automation - Open Taskfile automation guide"
+      - echo "  task docs-quick     - Open quick reference card"
+
+  # Documentation tasks
+  docs:
+    desc: Open documentation in browser
+    summary: |
+      Open the main documentation in your default browser
+      Usage: task docs
+    cmds:
+      - open docs/README.md || xdg-open docs/README.md || echo "Please open docs/README.md manually"
+
+  docs-automation:
+    desc: Open Taskfile automation documentation
+    summary: |
+      Open the Taskfile automation guide in your default browser
+      Usage: task docs-automation
+    cmds:
+      - open docs/taskfile-automation.md || xdg-open docs/taskfile-automation.md || echo "Please open docs/taskfile-automation.md manually"
+
+  docs-quick:
+    desc: Open quick reference card
+    summary: |
+      Open the quick reference card with essential commands
+      Usage: task docs-quick
+    cmds:
+      - open docs/quick-reference.md || xdg-open docs/quick-reference.md || echo "Please open docs/quick-reference.md manually"
+
+  # Default task
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list

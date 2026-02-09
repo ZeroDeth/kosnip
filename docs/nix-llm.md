@@ -49,10 +49,10 @@ Before beginning, ensure you have:
 
 - **Root Password (Installed System)**: After installation, set a root password for the freshly installed NixOS (see below).
 - **Network Configuration**: Update the network settings as needed for your environment.
-- **Install nix-llm**: Use the justfile to automate the installation. From your project root, run:
+- **Install nix-llm**: Use the Taskfile to automate the installation. From your project root, run:
 
   ```sh
-  just install <IP_ADDRESS>
+  task install HOST=nix-llm IP=<IP_ADDRESS>
   ```
   Replace `<IP_ADDRESS>` with the address of your NixOS VM.
 
@@ -79,10 +79,10 @@ Before beginning, ensure you have:
 
 ## Setting Up SSH
 
-SSH access to your NixOS VM is handled automatically by Tailscale and the justfile workflow in this repository. You do **not** need to manually configure SSH keys or edit `configuration.nix` for SSH access.
+SSH access to your NixOS VM is handled automatically by Tailscale and the Taskfile workflow in this repository. You do **not** need to manually configure SSH keys or edit `configuration.nix` for SSH access.
 
 - After running `tailscale up --ssh` on your VM, you can securely SSH to it using Tailscale’s built-in authentication and the Tailscale-assigned IP or hostname.
-- The `just` commands in this repo automate the provisioning and connection process using Nix flakes and Tailscale.
+- The `task` commands in this repo automate the provisioning and connection process using Nix flakes and Tailscale.
 
 > **Note:**
 > If you encounter SSH connection issues, ensure Tailscale is running and authenticated on both client and VM. Manual SSH configuration is only needed for advanced or custom setups.
@@ -101,11 +101,11 @@ SSH access to your NixOS VM is handled automatically by Tailscale and the justfi
 3. **Update Submodules**:
    From your project root:
    ```sh
-   just sub-update
+   task sub-update
    ```
 4. **Generate Docker Compose for nix-llm**:
    ```sh
-   just compose nix-llm
+   task compose nix-llm
    ```
    This generates a `docker-compose.yml` for the LLM stack.
 5. **Start the LLM Services**:
